@@ -327,3 +327,16 @@ def test_default_backend_is_lexical_and_needs_no_embedding_model():
     agent = MemoryQAAgent(chat_client=MockChatClient())
     assert agent.encoder is None, "the default path must not construct an encoder"
     assert hasattr(agent.store, "search_bm25")
+
+
+def test_cot_is_off_by_default_and_targets_only_multi_or_comparison():
+    assert RetrievalConfig().cot_multi is False
+    # reasoning prompt only for multi / comparison; a plain single-fact mcq stays terse
+    reasoned = MemoryQAAgent._build_structured_prompt(
+        "以下哪些正确？", ["a", "b", "c", "d"], "multi", "ctx", reason=True
+    )
+    terse = MemoryQAAgent._build_structured_prompt(
+        "以下哪些正确？", ["a", "b", "c", "d"], "multi", "ctx", reason=False
+    )
+    assert "quote the exact sentence" in reasoned and "carved out" in reasoned
+    assert "Do not explain" in terse and "quote the exact sentence" not in terse

@@ -132,6 +132,12 @@ class RetrievalConfig:
     multi_option_audit: bool = True  # independently check every option on multi-choice
     structured_judgement: bool = True
     structured_judgement_max_tokens: int = 256
+    # Chain-of-thought, applied ONLY to multi-select / comparison questions (the
+    # types that need option-by-option reasoning). Off by default: it is the
+    # inference-time reasoning lever, but it multiplies completion tokens, so it
+    # is targeted rather than global. See DeepSeek-R1's inference-time CoT.
+    cot_multi: bool = False
+    cot_max_tokens: int = 700
     # Independent answer samples aggregated by per-letter majority vote. 1 = off.
     # The provider is non-deterministic even at temperature 0, so a single sample
     # carries real variance; >1 trades tokens for a more stable answer.
@@ -648,9 +654,16 @@ class MemoryQAAgent:
             )
             calculation_draft = _verify_calculation_draft(calculation_result.text)
             calculation_usage = calculation_result.usage
+        # Targeted chain-of-thought: reason option-by-option only where it pays —
+        # multi-select and explicit comparison claims — so completion tokens grow
+        # only on the ~1/5 of questions that need the reasoning.
+        use_cot = self.config.cot_multi and (
+            qtype == "multi" or _needs_claim_check(question, options)
+        )
         user_prompt = (
             self._build_structured_prompt(
-                question, options, qtype, context, calculation_draft=calculation_draft
+                question, options, qtype, context,
+                calculation_draft=calculation_draft, reason=use_cot,
             )
             if self.config.structured_judgement and not audit_text
             else self._build_prompt(
@@ -669,7 +682,9 @@ class MemoryQAAgent:
             {"role": "user", "content": user_prompt},
         ]
         answer_max_tokens = (
-            self.config.structured_judgement_max_tokens
+            self.config.cot_max_tokens
+            if use_cot
+            else self.config.structured_judgement_max_tokens
             if self.config.structured_judgement
             else self.config.max_answer_tokens
         )
@@ -836,6 +851,7 @@ class MemoryQAAgent:
         qtype: str,
         context: str,
         calculation_draft: str = "",
+        reason: bool = False,
     ) -> str:
         labels = [chr(ord("A") + i) for i in range(len(options))]
         opt_lines = "\n".join(
@@ -885,10 +901,25 @@ class MemoryQAAgent:
             "entails its complete claim; when the supporting evidence is weak, partial, or "
             "absent, mark INSUFFICIENT and exclude it rather than guessing. "
             + relation
-            + "Output exactly one line per option in the form LETTER=STATE, where STATE is "
-            "SUPPORTED, REFUTED, or INSUFFICIENT, followed by one final line ANSWER:LETTERS. "
-            "Include only SUPPORTED letters in ANSWER, sorted; exclude INSUFFICIENT and REFUTED. "
-            "Do not explain."
+            + (
+                # Reasoning mode: think each option through before deciding. The
+                # nested cases that fail without this (an exception to an
+                # exclusion; an equality that must be computed) need the chain
+                # laid out, not a one-shot label.
+                "For EACH option, on its own line, first quote the exact sentence in "
+                "Context that decides it (or write 'no evidence'), then reason one step "
+                "to a conclusion — resolving any nested rule such as an exception to an "
+                "exclusion ('excluded, BUT X is carved out, so X is NOT excluded') or an "
+                "equality that must be computed ('40000 vs 35000 -> not equal') — and end "
+                "the line with =SUPPORTED, =REFUTED, or =INSUFFICIENT. After all options, "
+                "output one final line ANSWER:LETTERS with only the SUPPORTED letters, "
+                "sorted."
+                if reason
+                else "Output exactly one line per option in the form LETTER=STATE, where "
+                "STATE is SUPPORTED, REFUTED, or INSUFFICIENT, followed by one final line "
+                "ANSWER:LETTERS. Include only SUPPORTED letters in ANSWER, sorted; exclude "
+                "INSUFFICIENT and REFUTED. Do not explain."
+            )
         )
 
     @staticmethod

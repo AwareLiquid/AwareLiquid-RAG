@@ -58,6 +58,7 @@ def main() -> int:
     ap.add_argument("--show-errors", action="store_true", help="print every wrong answer")
     ap.add_argument("--self-consistency", type=int, default=1,
                     help="independent answer samples aggregated by majority vote (1=off)")
+    ap.add_argument("--cot", action="store_true", help="chain-of-thought on multi/comparison questions")
     args = ap.parse_args()
 
     corpus = load_corpus()
@@ -75,6 +76,7 @@ def main() -> int:
         config=RetrievalConfig(
             retrieval_backend="lexical",
             self_consistency=args.self_consistency,
+            cot_multi=args.cot,
         ),
         chat_client=MockChatClient() if mock else None,
     )
