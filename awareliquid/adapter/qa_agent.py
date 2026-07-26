@@ -132,10 +132,13 @@ class RetrievalConfig:
     multi_option_audit: bool = True  # independently check every option on multi-choice
     structured_judgement: bool = True
     structured_judgement_max_tokens: int = 256
-    # Chain-of-thought, applied ONLY to multi-select / comparison questions (the
-    # types that need option-by-option reasoning). Off by default: it is the
-    # inference-time reasoning lever, but it multiplies completion tokens, so it
-    # is targeted rather than global. See DeepSeek-R1's inference-time CoT.
+    # Chain-of-thought on multi-select / comparison questions, option by option.
+    # Off by default AND KEPT OFF: measured on the two failing multi-select
+    # questions it did not help (one stayed wrong; the other, previously correct,
+    # was reasoned INTO a wrong answer). The real accuracy lever behind
+    # DeepSeek-R1 / Kimi is RL that modifies weights, which an API-only adapter
+    # cannot use; prompt-level CoT just gives a weak reasoner more places to slip.
+    # Retained as an opt-in for stronger future base models.
     cot_multi: bool = False
     cot_max_tokens: int = 700
     # Independent answer samples aggregated by per-letter majority vote. 1 = off.
