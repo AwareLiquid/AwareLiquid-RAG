@@ -1,6 +1,24 @@
-# AwareLiquid
+# AwareLiquid-M2 — document-QA adapter
 
 **An external memory-compression adapter for long-document multiple-choice QA.**
+
+> ### ⚠️ Not the MT-LNN architecture — read this if you arrived from the model repos
+>
+> "M2" is used for three different things across this project. **This repository is the
+> document-QA adapter**: it wraps a *frozen* base model reached over HTTP and does all its work
+> (indexing, retrieval, compression) locally. **It contains no model architecture, trains no
+> weights, and shares no code with the liquid-neural-network line.**
+>
+> | "M2" refers to | Where | What it is |
+> |---|---|---|
+> | **This repo** | `AwareLiquid/AwareLiquid-M2` | Retrieval + compression adapter around a frozen API model |
+> | The 2B roadmap | [`M1/docs/ROADMAP_M2.md`](https://github.com/everest-an/M1/blob/main/docs/ROADMAP_M2.md) | Architecture plan for a 2B reasoning engine |
+> | The 125M line | `M1` code, `m2_final.pt`, `kaggle_kernels/awareliquid_m2_pretrain/` | MT-LNN backbone plus four bio-inspired auxiliary modules |
+>
+> So the **91.7%** figure below belongs to *this adapter*, not to the MT-LNN architecture. The
+> architecture's own measured results — O(1) inference state, cross-window recall, robustness to
+> irregular sampling — are in
+> [M1/RESULTS.md](https://github.com/everest-an/M1/blob/main/RESULTS.md).
 
 AwareLiquid answers questions over documents far longer than a model's context
 window, while spending as few generation tokens as possible. It is designed for
