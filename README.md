@@ -153,18 +153,32 @@ python benchmarks/bench_adapter.py          # real multilingual embedder
 python benchmarks/bench_adapter.py --fake   # lexical stand-in, no model download
 ```
 
-On the bundled set (3 documents inflated to ≈2,800 tokens each, 6 questions):
+On the bundled set (3 financial documents inflated with boilerplate to ≈22.7k
+full-document tokens, 8 questions):
 
-| Metric | Real e5 | Lexical stand-in |
-|--------|:-------:|:----------------:|
-| Retrieval recall@4 (answer chunk retrieved) | **6/6** | 5/6 |
-| Answer-sentence retention after compression | **6/6** | 5/6 |
-| Prompt context tokens vs. full-document | **≈1.1k vs 17k (−94%)** | −94% |
-| Mean compression ratio | 0.48 | 0.46 |
+| Metric | Lexical stand-in (8-q set, deterministic) |
+|--------|:----------------:|
+| Retrieval recall@1, dense → hybrid RRF | 6/8 → 6/8 |
+| Retrieval recall@4 (answer chunk retrieved) | 7/8 → 8/8 |
+| Answer-sentence retention after compression | 7/8 → 8/8 |
+| End-to-end valid rows (formal format) | 8/8 |
+| Prompt context tokens vs. full-document | 1254 vs 22668 (−94%) |
 
-The semantic embedder recovers a paraphrased question ("归母净利润同比增长" vs. the
-document's "归属于母公司股东的净利润…较上年同期增长") that pure lexical overlap misses —
+These are **single-run screening counts, not conclusions**: they prove the
+pipeline works and the gate conditions hold, not that retrieval beats any
+baseline. Citing them externally requires multi-seed expansion through the
+`publishable()` gate in `benchmarks/experiment_protocol.py`. Numbers are
+reconciled in `docs/RESULTS.md` (single source of truth); pre-registration
+rules live in `docs/PREREGISTRATION.md`. The `--fake` run is byte-identical
+across processes (three-run proof: `benchmarks/results/bench_adapter_fake_20260906_r1.log`
+and its `r2`/`r3` siblings; pinned by `tests/test_bench_determinism.py`).
+
+A historical single-run e5 result (6-question set) is archived in
+`docs/RESULTS.md` (SUPERSEDED section): it showed the multilingual embedder
+recovering a paraphrased question ("归母净利润同比增长" vs. the document's
+"归属于母公司股东的净利润…较上年同期增长") that pure lexical overlap misses —
 which is why the multilingual model, not a keyword index, drives retrieval.
+Re-run it through the `publishable()` gate before citing it anywhere.
 
 **Scope:** this benchmark validates retrieval, compression and token efficiency,
 which are the adapter's job. The final letter is chosen by the frozen model, so

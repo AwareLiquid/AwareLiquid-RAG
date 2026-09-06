@@ -222,7 +222,8 @@ def main() -> None:
     probe_snapshot_path = RUN_DIR / "model-probe.json"
     probe_snapshot_hash = digest(probe)
     write_exclusive(probe_snapshot_path, canonical_bytes(probe) + b"\n")
-    sidecar(probe_snapshot_path, probe_snapshot_hash)
+    # sidecar = 磁盘字节哈希；对象哈希只进 packet/contract 的 *_sha256 字段
+    sidecar(probe_snapshot_path, file_digest(probe_snapshot_path))
 
     packet = {
         "packet_version": 1,
@@ -363,11 +364,11 @@ def main() -> None:
     }
     manifest_hash = digest(manifest)
     write_exclusive(RUN_DIR / "stage-contract.json", contract_body)
-    sidecar(RUN_DIR / "stage-contract.json", contract_hash)
+    sidecar(RUN_DIR / "stage-contract.json", file_digest(RUN_DIR / "stage-contract.json"))
     write_exclusive(RUN_DIR / "packet.json", packet_body)
-    sidecar(RUN_DIR / "packet.json", packet_hash)
+    sidecar(RUN_DIR / "packet.json", file_digest(RUN_DIR / "packet.json"))
     write_exclusive(RUN_DIR / "manifest.json", (canonical_bytes(manifest) + b"\n"))
-    sidecar(RUN_DIR / "manifest.json", manifest_hash)
+    sidecar(RUN_DIR / "manifest.json", file_digest(RUN_DIR / "manifest.json"))
     write_exclusive(
         RUN_DIR / "creation-record.json",
         (

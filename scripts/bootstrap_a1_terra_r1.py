@@ -149,7 +149,8 @@ def main() -> None:
     probe_path = RUN_DIR / "model-probe.json"
     probe_hash = object_hash(probe)
     write_new(probe_path, canonical(probe) + b"\n")
-    sidecar(probe_path, probe_hash)
+    # sidecar = 磁盘字节哈希（sha256sum 语义）；canonical 对象哈希只进 *_sha256 字段
+    sidecar(probe_path, raw_hash(probe_path))
     write_set = [str(REPO / p) for p in ("awareliquid/adapter/afac_contract.py", "submit.py", "tests/test_afac_contract.py", "tests/test_submit.py")]
     ac = [
         "AC-A1-01: official five-column CSV header and official summary row are rendered in UTF-8 with no unused_tokens",
@@ -176,7 +177,8 @@ def main() -> None:
     for name, obj, digest in (("stage-contract.json", contract, contract_hash), ("packet.json", packet, packet_hash), ("manifest.json", manifest, manifest_hash)):
         path = RUN_DIR / name
         write_new(path, canonical(obj) + b"\n")
-        sidecar(path, digest)
+        # sidecar 必须是磁盘字节（含尾部 LF）；digest 只作对象哈希留档
+        sidecar(path, raw_hash(path))
     print(json.dumps({"run_id": RUN_ID, "contract_sha256": contract_hash, "packet_sha256": packet_hash, "manifest_sha256": manifest_hash}, ensure_ascii=False, sort_keys=True))
 
 

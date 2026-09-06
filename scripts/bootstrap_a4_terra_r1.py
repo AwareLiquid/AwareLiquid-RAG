@@ -137,7 +137,8 @@ def main():
     probe_hash = obj_hash(model_probe)
     probe_path = RUN / "model-probe.json"
     create_new(probe_path, canon(model_probe) + b"\n")
-    sidecar(probe_path, probe_hash)
+    # sidecar = 磁盘字节哈希（sha256sum 语义）；probe_hash 对象哈希只进 *_sha256 字段
+    sidecar(probe_path, raw_hash(probe_path))
     writes = [str(REPO / item) for item in ("awareliquid/formal_reasoning.py", "tests/test_formal_reasoning.py")]
     criteria = [
         "AC-A4-01: Evidence context preserves original text and all required boundaries/IDs without semantic transformation",
@@ -188,7 +189,8 @@ def main():
     for name, value, digest in (("stage-contract.json", contract, contract_hash), ("packet.json", packet, packet_hash), ("manifest.json", manifest, manifest_hash)):
         path = RUN / name
         create_new(path, canon(value) + b"\n")
-        sidecar(path, digest)
+        # sidecar 必须是磁盘字节（含尾部 LF）；digest 只作对象哈希留档
+        sidecar(path, raw_hash(path))
     print(json.dumps({"run_id": RUN_ID, "contract_sha256": contract_hash, "packet_sha256": packet_hash, "manifest_sha256": manifest_hash}, sort_keys=True))
 
 

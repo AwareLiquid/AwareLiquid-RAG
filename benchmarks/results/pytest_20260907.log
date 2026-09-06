@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.3, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/aricredemption/Projects/AwareLiquid-M2
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.14.2
+collected 197 items
+
+tests/test_afac_contract.py ....................                         [ 10%]
+tests/test_agent.py .....................                                [ 20%]
+tests/test_bench_determinism.py ..                                       [ 21%]
+tests/test_check_results_refs.py ..........                              [ 26%]
+tests/test_chunker.py .....                                              [ 29%]
+tests/test_compressor.py .......                                         [ 32%]
+tests/test_contracts_m0.py .........................                     [ 45%]
+tests/test_evidence.py ............................                      [ 59%]
+tests/test_evidence_index.py .....                                       [ 62%]
+tests/test_experiment_protocol.py .........                              [ 67%]
+tests/test_formal_reasoning.py ......                                    [ 70%]
+tests/test_hybrid.py ........                                            [ 74%]
+tests/test_lexical_store.py .......                                      [ 77%]
+tests/test_multi_query.py ......                                         [ 80%]
+tests/test_qwen_client.py .........................                      [ 93%]
+tests/test_schemas.py .........                                          [ 97%]
+tests/test_submit.py ....                                                [100%]
+
+============================= 197 passed in 6.04s ==============================
