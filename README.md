@@ -1,8 +1,14 @@
-# AwareLiquid-M2 — document-QA adapter
+# AwareLiquid-RAG — document-QA adapter
 
 **An external memory-compression adapter for long-document multiple-choice QA.**
 
-> ### ⚠️ Not the MT-LNN architecture — read this if you arrived from the model repos
+> This repository was renamed from `AwareLiquid-M2` to `AwareLiquid-RAG`.
+> It provides retrieval and compression around a frozen HTTP model.
+> Next-generation architecture research belongs to
+> [AwareLiquid/M2](https://github.com/AwareLiquid/M2); the stable model core
+> belongs to [AwareLiquid/M1](https://github.com/AwareLiquid/M1).
+>
+> ### Historical naming
 >
 > "M2" is used for three different things across this project. **This repository is the
 > document-QA adapter**: it wraps a *frozen* base model reached over HTTP and does all its work
@@ -11,7 +17,7 @@
 >
 > | "M2" refers to | Where | What it is |
 > |---|---|---|
-> | **This repo** | `AwareLiquid/AwareLiquid-M2` | Retrieval + compression adapter around a frozen API model |
+> | **This repo (now RAG)** | `AwareLiquid/AwareLiquid-RAG` | Retrieval + compression adapter around a frozen API model |
 > | The 2B roadmap | [`M1/docs/ROADMAP_M2.md`](https://github.com/everest-an/M1/blob/main/docs/ROADMAP_M2.md) | Architecture plan for a 2B reasoning engine |
 > | The 125M line | `M1` code, `m2_final.pt`, `kaggle_kernels/awareliquid_m2_pretrain/` | MT-LNN backbone plus four bio-inspired auxiliary modules |
 >
