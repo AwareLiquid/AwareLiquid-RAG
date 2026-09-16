@@ -215,3 +215,22 @@
   不转化为长度外推；固定步数预算下 k=8 优化更难。
 - 按判据：latent recurrent depth 方向 **REJECTED**（筛查区留痕）；轴转 P3 次选
   （predictive world model 筛查）。
+
+## R4：测试场灵敏度校准（阳性对照：层级分块聚合 vs 平铺池化）— 2026-09-17
+
+- 动机（P4 定级结论）：R2/R3 双阴性后必须先回答"是机制无用，还是测试场测不出差异"。
+  本轮插入阳性对照：层级分块聚合（chunk 级 parity + 块间组合）在构造上匹配 parity 的
+  复合结构，应当赢平铺池化。过门 → 测试场有区分度（此后阴性结果可信）；不过 →
+  合成测试场对机制研究宣布失效，真实基准（人工判定项）成为唯一出路。
+- 两臂：arm-flat = trunk + workspace×1 + 平铺池化（= R2 fixed 基线）；
+  arm-hier = 同前段 + chunk 池化（c=8）→ 二级 workspace 过 chunk 序列 → chunk 均值读出。
+  其余全同（prefix_parity、6000 步、课程、d=96、batch 64、CPU 确定性）。
+- 预注册判据（跑之前写死）：
+  - 主门：`publishable(per_seed_hier, per_seed_flat)` on OOD acc（各 5 seeds，非双峰、
+    配对符号检验 p<0.05）→ 过门 = 测试场有效 + 阳性对照成立（PROVEN）；
+    不过 = 测试场无区分度（筛查区留痕，合成轴冻结）。
+  - 诊断：长前缀桶（q≥25）分桶 acc（层级聚合的收益应集中在此桶）。
+  - 沿用门：G1 确定性重跑（wall_s 除外）；G2 双臂 in-dist ≥ 0.55；G4 单 run ≤ 10 min。
+- 运行计划：py_compile + 150 步双臂 smoke → 全量 2 臂 × 5 seeds ≈ 25 min 本机。
+  归档 `benchmarks/results/r4_arch_control_<日期>_{flat,hier}_s{seed}.json`。
+- 结果（跑完填）：（待填）

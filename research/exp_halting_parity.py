@@ -173,6 +173,55 @@ class HaltingNet(nn.Module):
         return acc, (torch.stack(lam_list, 0), torch.stack(p_list, 0), p_remain)
 
 
+class HierarchicalNet(nn.Module):
+    """R4 阳性对照：chunk 池化 → 二级 workspace 过 chunk 序列 → 均值读出。
+
+    与 arm-flat 的前段完全同构（trunk + workspace×1），仅读出从"平铺池化"换为
+    "层级分块聚合"——chunk 级聚合匹配 parity 的复合结构（块内 parity → 块间
+    parity），长度外推应当由块数线性增长承载，而非靠平铺均值向量硬猜。
+    """
+
+    CHUNK = 8
+
+    def __init__(self):
+        super().__init__()
+        self.tok = nn.Embedding(3, D_MODEL)
+        self.pos = nn.Embedding(MAX_LEN, D_MODEL)
+        self.trunk = Block()
+        self.workspace = Block()
+        self.chunk_block = Block()
+        self.head = nn.Linear(D_MODEL, 2)
+
+    @staticmethod
+    def _pool(h, mask):
+        summed = (h * mask.unsqueeze(-1)).sum(1)
+        return summed / mask.sum(1, keepdim=True).clamp(min=1)
+
+    def forward(self, x, mask, qpos=None, depth: int = 1):  # depth 仅占位（hier 不循环）
+        n, L = x.shape
+        pos = torch.arange(L, device=x.device).unsqueeze(0).expand(n, -1)
+        emb = self.tok(x)
+        if qpos is not None:
+            marker = torch.zeros_like(emb)
+            marker[torch.arange(n), qpos] = 1.0
+            emb = emb + marker * self.tok.weight[QUERY_ID]
+        h = self.workspace(self.trunk(emb + self.pos(pos), mask), mask)
+
+        c = self.CHUNK
+        pad = (c - L % c) % c
+        if pad:
+            h = torch.nn.functional.pad(h, (0, 0, 0, pad))
+            mask = torch.nn.functional.pad(mask, (0, pad))
+        nchunk = (L + pad) // c
+        hc = h.view(n, nchunk, c, D_MODEL)
+        mc = mask.view(n, nchunk, c)
+        chunk_vec = (hc * mc.unsqueeze(-1)).sum(2) / mc.sum(2, keepdim=True).clamp(min=1)
+        chunk_mask = mc.any(2)
+        hc2 = self.chunk_block(chunk_vec, chunk_mask)
+        pooled = (hc2 * chunk_mask.unsqueeze(-1)).sum(1) / chunk_mask.sum(1, keepdim=True).clamp(min=1)
+        return self.head(pooled), None
+
+
 def halting_loss(p_list, p_remain):
     # PonderNet: 与 Geometric(PRIOR_P) 先验的交叉熵（log-domain 等价 KL 的 CE 项）。
     K = p_list.shape[0]
@@ -236,12 +285,16 @@ def main() -> int:
     ap.add_argument("--task", choices=("parity", "prefix_parity"), default="parity")
     ap.add_argument("--arm", choices=("fixed", "adaptive"), default="fixed")
     ap.add_argument("--depth", type=int, default=1, help="fixed-depth loop count (R3); arm must be fixed")
+    ap.add_argument("--arch", choices=("flat", "hier"), default="flat",
+                    help="hier = R4 positive control (chunked two-level aggregation)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--steps", type=int, default=1200)
     ap.add_argument("--out", type=str, required=True)
     args = ap.parse_args()
     if args.arm == "adaptive" and args.depth != 1:
         ap.error("--depth applies to the fixed arm only (progressive adaptive is K=8 by design)")
+    if args.arch == "hier" and (args.arm != "fixed" or args.depth != 1):
+        ap.error("--arch hier composes with --arm fixed --depth 1 only")
 
     torch.use_deterministic_algorithms(True)
     torch.set_num_threads(2)
@@ -251,7 +304,7 @@ def main() -> int:
     gen_eval_in = torch.Generator().manual_seed(9001)
     gen_eval_ood = torch.Generator().manual_seed(9002)
 
-    model = HaltingNet(adaptive=(args.arm == "adaptive"))
+    model = HaltingNet(adaptive=(args.arm == "adaptive")) if args.arch == "flat" else HierarchicalNet()
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01)
     t0 = time.time()
     curriculum_until = int(0.7 * args.steps)  # 长度课程：前期短串（易），后期全量 [8,32]
@@ -278,6 +331,7 @@ def main() -> int:
     ood, _, buckets_ood = evaluate(model, gen_eval_ood, 40, 64, 512, args.task, args.depth)
     result = {
         "exp": "r2_halting_parity" if args.depth == 1 else "r3_latent_depth",
+        "arch": args.arch,
         "task": args.task,
         "arm": args.arm,
         "depth": args.depth,
