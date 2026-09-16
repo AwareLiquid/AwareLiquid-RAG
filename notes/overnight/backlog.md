@@ -45,22 +45,20 @@
 - 运行计划：本机 `PYTHONHASHSEED=1 .venv/bin/python benchmarks/bench_adapter.py --fake`（分钟级）。
 - 状态：**已闭环（2026-09-11 R0）**：输出与旧日志逐字节一致（`benchmarks/results/r0_bench_fake_20260911_r1.log`）。
 
-## P0' — 自适应停止（PonderNet 式 halt）合成任务消融 [SCREENING NO-GO ×2（至 2026-09-17）]
+## P0' — 自适应停止（PonderNet 式 halt）合成任务消融 [SCREENING NO-GO ×3（至 2026-09-17）；#4=阶梯终局]
 
-- 预注册：`docs/PREREGISTRATION.md` 附录 R2（2026-09-16 落盘后运行）；脚本 `research/exp_halting_parity.py`。
-- **R2 screening #1 判定：NO-GO**（证据 `benchmarks/results/r2_halting_smoke_20260916_r1.log`）：
-  G1 确定性 PASS（科学指标逐比特一致，仅 wall_s 仪表字段差 0.1s）；G2 FAIL（两臂 in-dist
-  ≈0.49/0.51 < 0.55，chance 水平）；G3 FAIL（mean_steps 1.01，halt 坍缩）；G4 PASS
-  （fixed 22.6s / adaptive 90.9s，2臂×5seeds ≈ 9.5 min，多种子可留本机）。
-- **R2 screening #2 判定（2026-09-17 00:25）：NO-GO ×2**（配置=6000 步+长度课程+halt bias
-  -2，00:03 落盘；证据 `benchmarks/results/r2_halting_smoke_20260917_r2.log`）。G1 PASS；
-  G2 FAIL（fixed 0.512/0.482、adaptive 0.488/0.502，loss 仍卡 ln2）；G3 FAIL（mean_steps
-  1.003，bias 只延迟坍缩）；G4 PASS（fixed 89s / adaptive 348s）。
-- 结论（两次 NO-GO 合并）：容量不是瓶颈，**任务形式是**——pooled 读出下 parity 缺少
-  渐进梯度路径，halt 无真实收益结构可学。
-- **下轮 = screening #3（升级条款内，无需人工）：任务形式更换**为「查询位置前缀 parity」
-  （串 + 查询位 q → 答 bits[0:q] 的异或；每个迭代步对应明确的前缀扩展增益，难度随 q
-  连续变化）。配置先落盘再跑；G1–G4 判据不变。全过才放行多种子（seeds≥3，publishable 门）。
+- 预注册：`docs/PREREGISTRATION.md` 附录 R2 及 screening 序节；脚本 `research/exp_halting_parity.py`。
+- screening #1（parity, 1200 步）：NO-GO——两臂 chance、halt 坍缩（详见附录与晨报 09-16 档）。
+- screening #2（parity, 6000 步+课程+bias）：NO-GO——容量校准无效，loss 卡 ln2。
+- **screening #3（prefix_parity, 6000 步）：NO-GO ×3，但 G2 首次 PASS**（证据
+  `benchmarks/results/r2_halting_prefix_20260917_r3.log`）：任务学会了（fixed in-dist
+  0.666、短前缀桶 0.83-0.87），可 halt 仍坍缩（mean_steps 1.028）——任务 CE 下额外
+  迭代无净收益，早停是 halt 头的理性行为。分桶：fixed 长前缀桶 0.324 vs adaptive
+  0.588（单 seed，仅方向性）。
+- **下轮 = screening #4（阶梯终局步）**：progressive-reveal——迭代 k 只能看到前
+  ⌈k/K·L⌉ 位，结构上强制"单步不足以答长前缀"；配置下轮落盘后运行。
+  **结局规则（已在附录落盘生效）**：#4 G3 再败 → P0' REJECTED（机制级阴性结果），
+  主轴转 latent-workspace recurrent（固定深度循环，不依赖可学习停步）；全过 → 多种子。
 - 依赖：无（纯 torch 合成数据，全离线）；与 R1 人工裁定全解耦。
 
 ## P2 — 工程：Kaggle 通道验证（CLI 安装 + 凭证 + CPU notebook hello-world）[IDEA]
