@@ -1,0 +1,50 @@
+run_id=a0-20260719T001816-26628
+thread_id=019f74b8-0bbf-74f0-a168-1ab34711a671
+ffa38514b27a7ef0834fea25710ffb574ef3bacb
+ M README.md
+ M awareliquid/__init__.py
+ M awareliquid/adapter/__init__.py
+ M awareliquid/adapter/qa_agent.py
+ M awareliquid/adapter/qwen_client.py
+ M awareliquid/memory/__init__.py
+ M awareliquid/memory/knowledge_store.py
+ M examples/eval_accuracy.py
+ M examples/run_qa.py
+ M submit.py
+ M tests/test_agent.py
+ M tests/test_hybrid.py
+ M tests/test_qwen_client.py
+ M tests/test_submit.py
+?? awareliquid/adapter/afac_contract.py
+?? awareliquid/adapter/contracts.py
+?? awareliquid/memory/lexical_store.py
+?? docs/AFAC2026_OFFICIAL_RULES_AND_EXECUTION_ALIGNMENT_2026-07-19.md
+?? docs/AFAC_M0_CONTRACT_EVIDENCE.md
+?? docs/AFAC_QWEN_FINANCIAL_QA_RESEARCH_AND_IMPLEMENTATION_HANDOFF_2026-07-18.md
+?? docs/plans/
+?? docs/runs/
+?? downloads/
+?? manifests/
+?? output/
+?? reference/
+?? scripts/
+?? tests/fixtures/
+?? tests/test_afac_contract.py
+?? tests/test_contracts_m0.py
+?? tests/test_lexical_store.py
+?? tmp/
+ README.md                             |  10 +-
+ awareliquid/__init__.py               |   2 +
+ awareliquid/adapter/__init__.py       |   2 +
+ awareliquid/adapter/qa_agent.py       | 134 ++++++++++++++++++++++---
+ awareliquid/adapter/qwen_client.py    | 177 ++++++++++++++++++++++++++++++++--
+ awareliquid/memory/__init__.py        |   2 +
+ awareliquid/memory/knowledge_store.py |  25 ++++-
+ examples/eval_accuracy.py             |   4 +-
+ examples/run_qa.py                    |   4 +-
+ submit.py                             |  79 ++++++++++-----
+ tests/test_agent.py                   |   6 ++
+ tests/test_hybrid.py                  |   7 ++
+ tests/test_qwen_client.py             |  16 +++
+ tests/test_submit.py                  |  27 ++++++
+ 14 files changed, 436 insertions(+), 59 deletions(-)
