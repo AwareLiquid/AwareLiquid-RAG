@@ -175,3 +175,12 @@
   配置不变；判优 = `publishable(per_seed_adaptive, per_seed_fixed)`（主指标 OOD acc），
   过门 → RESULTS.md PROVEN 追加行 + GRADUATION-CANDIDATE；不过 → 筛查区留痕。
 - 结果（跑完填）：（待填）
+
+### R2 多种子终判（2026-09-17 01:55 判定）——REJECTED
+
+- `publishable(per_seed_adaptive, per_seed_fixed)`：OOD acc **0/5 胜**，配对符号检验
+  p=0.0625 ≥ 0.05；in-dist 1/5 胜（p=0.375）；双臂非双峰。→ **判负**。
+- adaptive 各种子 mean_steps = [2.005, 2.005, 2.032, 2.005, 2.003]：固定 2 步预算，
+  无逐例自适应证据。
+- 按终局规则：P0' REJECTED（机制级阴性结果，RESULTS.md 筛查区留痕）；主轴转
+  latent-workspace recurrent（固定深度循环，不依赖可学习停步）。

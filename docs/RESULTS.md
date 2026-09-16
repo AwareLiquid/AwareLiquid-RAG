@@ -43,6 +43,7 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
 | bench lexical stand-in 旧 6 题集：recall@4、retention、压缩率 | 5/6、5/6、0.46 | **SUPERSEDED (2026-09-06)**——被 8 题集确定性运行取代（题集与编码器哈希均已变更，数字不可比） | 旧 `benchmarks/bench_adapter.py` 运行，无留档日志 |
 | 修复前 bench `--fake` 两次运行 8/8 与 7/8 互相矛盾 | — | **RETRACTED (2026-09-06)**——根因：`benchmarks/bench_adapter.py` 的 `LexicalEncoder` 用内建 `hash()`，盐随进程随机；两值均为随机盐的运气，不代表系统能力 | 无留档（修复前输出未保存），仅本行记录；修复后日志见 `benchmarks/results/` |
 | run 目录 JSON sidecar 哈希（提交于 f459eca） | 66 处失配 | **CORRECTED (2026-09-06)**——sidecar 哈希的是 canonical compact JSON，落盘是 pretty-print 版，内容语义相同（逐一验证 canonical 哈希吻合后重写为磁盘字节哈希，0 处遗留失配）；管线出处：`scripts/bootstrap_a1_terra_r1.py` 的 `sidecar()` 调用点混用 `object_hash` 与 `raw_hash` | `docs/runs/`（修复后 `scripts/check_results_refs.py` PASS） |
+| R2 自适应停止（PonderNet 式 halt，progressive-reveal prefix-parity，5 seeds 配对）：adaptive vs fixed 的 OOD / in-dist accuracy | adaptive OOD [0.547, 0.551, 0.502, 0.555, 0.502] vs fixed [0.553, 0.572, 0.514, 0.566, 0.537]——**adaptive 0/5 胜**（配对符号检验 p=0.0625）；in-dist 1/5 胜（p=0.375）；双臂均非双峰 | **REJECTED (2026-09-17)**——`publishable()` 判负：progressive-reveal 下 halt 学到固定 2 步预算（各种子 mean_steps≈2.00），准确率一致性地不低于全信息单步基线；机制级阴性结果：本规模下可学习停步无净收益 | `benchmarks/results/r2_halting_prefix_20260917_multi_summary.json`、`benchmarks/results/r2_halting_prefix_20260917_multi.log`（协议与 screening 链：`docs/PREREGISTRATION.md` 附录 R2） |
 
 ## What we do NOT claim（负面声明）
 
@@ -107,3 +108,15 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
   磁盘字节哈希（`raw_hash`/`file_digest`）——换 RUN_ID 重跑不再复制
   66 处失配事故；manifest/contract 内部 `*_sha256` 字段保持 canonical
   对象哈希语义（有文档化的 hash domain，与 sidecar 是两套含义）。
+
+- **2026-09-17**（类脑轴首个多种子判定）：
+  - R2「自适应停止」（PonderNet 式 halt）走完预注册全链：4 轮 screening
+    （parity→parity+课程→prefix-parity→progressive-reveal，逐轮配置先落盘）
+    + 5 seeds 多种子对照，终判 **REJECTED**：progressive-reveal 使 halt 脱离
+    坍缩（mean_steps≈2.0，G3 首过），但 5 seeds 配对 0/5 胜全信息单步基线
+    （OOD 符号检验 p=0.0625），`publishable()` 判负。完整数字与证据见
+    筛查区新行；方向梯队与逐轮判定见 `notes/overnight/backlog.md` P0'。
+  - 判负亦产出可复用资产：`research/exp_halting_parity.py`（双臂、双任务、
+    确定性、progressive-reveal 开关）；后续 latent-recurrent 方向直接复用
+    其合成任务与验收骨架。
+  - 无 RESULTS.md 既有判定行改动；本节与筛查区新行均为追加。

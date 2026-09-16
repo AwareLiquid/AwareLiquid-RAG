@@ -1,0 +1,55 @@
+{
+  "K": 8,
+  "arm": "adaptive",
+  "beta": 0.05,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "acc": 0.7758620977401733,
+      "mean_steps": 2.0023937225341797,
+      "n": 232
+    },
+    "q_bucket_1": {
+      "acc": 0.4674796760082245,
+      "mean_steps": 2.0038068294525146,
+      "n": 246
+    },
+    "q_bucket_2": {
+      "acc": 0.529411792755127,
+      "mean_steps": 2.003048896789551,
+      "n": 34
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "acc": 0.6944444179534912,
+      "mean_steps": 2.0007777214050293,
+      "n": 72
+    },
+    "q_bucket_1": {
+      "acc": 0.48275861144065857,
+      "mean_steps": 2.0021138191223145,
+      "n": 174
+    },
+    "q_bucket_2": {
+      "acc": 0.4624060094356537,
+      "mean_steps": 2.0030953884124756,
+      "n": 266
+    }
+  },
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "d_model": 96,
+  "exp": "r2_halting_parity",
+  "halt_bias_init": -2.0,
+  "indist_acc": 0.611328125,
+  "mean_steps": 2.0031161308288574,
+  "ood_acc": 0.501953125,
+  "prior_p": 0.25,
+  "python_hash_seed": "0",
+  "seed": 5,
+  "steps": 6000,
+  "task": "prefix_parity",
+  "torch_version": "2.13.0",
+  "train_loss_last": 0.5775388479232788,
+  "wall_s": 278.9
+}

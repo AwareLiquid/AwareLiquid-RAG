@@ -1,0 +1,49 @@
+{
+  "K": 8,
+  "arm": "fixed",
+  "beta": 0.05,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "acc": 0.767241358757019,
+      "n": 232
+    },
+    "q_bucket_1": {
+      "acc": 0.5040650367736816,
+      "n": 246
+    },
+    "q_bucket_2": {
+      "acc": 0.38235294818878174,
+      "n": 34
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "acc": 0.7222222089767456,
+      "n": 72
+    },
+    "q_bucket_1": {
+      "acc": 0.5287356376647949,
+      "n": 174
+    },
+    "q_bucket_2": {
+      "acc": 0.44736841320991516,
+      "n": 266
+    }
+  },
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "d_model": 96,
+  "exp": "r2_halting_parity",
+  "halt_bias_init": null,
+  "indist_acc": 0.615234375,
+  "mean_steps": null,
+  "ood_acc": 0.513671875,
+  "prior_p": 0.25,
+  "python_hash_seed": "0",
+  "seed": 3,
+  "steps": 6000,
+  "task": "prefix_parity",
+  "torch_version": "2.13.0",
+  "train_loss_last": 0.5875226855278015,
+  "wall_s": 80.7
+}
