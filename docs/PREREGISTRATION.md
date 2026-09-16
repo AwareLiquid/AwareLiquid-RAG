@@ -128,3 +128,24 @@
 - 运行前防线（screening #2 事故后固化）：`py_compile` 强制 + 双臂 150 步 infra
   selfcheck（本轮已过，无 NaN、JSON 字段齐全）→ 再进正式三连。
 - 结果（跑完填）：（待填）
+
+### R2 screening #3 结果（2026-09-17 01:05 判定）+ screening #4 终局配置预告
+
+- **判定：G2 首次 PASS，但 G3 FAIL → 综合 NO-GO ×3**（证据
+  `benchmarks/results/r2_halting_prefix_20260917_r3.log`）。
+- G1 PASS（wall_s 除外逐字段一致）；**G2 PASS**——fixed in-dist 0.666 / adaptive 0.666
+  （均 ≥ 0.55；fixed loss 0.480，短前缀桶 acc 0.83-0.87）——任务形式更换成功，
+  parity 家族第一次真正被学习；**G3 FAIL**——mean_steps 1.028 < 1.3：任务学会了，
+  但 halt 头仍判"一步足够"；G4 PASS（fixed 92s / adaptive 363s）。
+- 分桶诊断（单 seed，仅方向性观察非结论）：fixed 臂长前缀桶（q≥25）in-dist 仅
+  0.324，adaptive 同桶 0.588，但 adaptive 在该桶平均停步同样 ≈1.01——它的优势
+  不来自迭代（噪声亦不可排除）。
+- 机理判读（假设，非结论）：读出各步独立池化、step-1 预测已不差，额外迭代在
+  任务 CE 下无净收益 → 早停是 halt 头的理性行为。**"多想一步"要有收益，必须让
+  单步在结构上不足以作答。**
+- **screening #4（阶梯终局步，下轮配置落盘后运行）**：progressive-reveal 前缀
+  parity——迭代 k 的注意力只能看到前 ⌈k/K·L⌉ 位（硬约束单步能力上界），使
+  长前缀必须迭代才能答对；G1–G4 判据不变，新增诊断同 #3。**结局规则（本轮
+  落盘即生效）：#4 若 G3 再败 → P0' 判 REJECTED（机制级阴性结果，归档筛查区/
+  backlog 留痕），类脑主轴转 latent-workspace recurrent（固定深度循环，不依赖
+  可学习停步）；若全过 → 多种子放行。**
