@@ -162,3 +162,16 @@
   （机制级阴性结果），主轴转 latent-workspace recurrent（固定深度循环）。
 - 运行前防线：py_compile + 双臂 150 步 infra selfcheck。
 - 结果（跑完填）：（待填）
+
+### R2 screening #4 结果（2026-09-17 01:12 判定）——**GO，多种子放行**
+
+- **G1–G4 全过**（证据 `benchmarks/results/r2_halting_prefix_20260917_r4.log`）：
+  G1 PASS；G2 PASS（fixed 0.666 / adaptive 0.619 in-dist，OOD 0.553 / 0.547）；
+  **G3 PASS——mean_steps 2.005 ∈ [1.3, 7.7]，坍缩首次被打破**；G4 PASS（86.8s / 324.8s）。
+- 诊断（非判据）：halt 学到的是统一 2 步预算（各 q 桶均 ≈2.0 步），非逐例自适应；
+  adaptive train_loss 0.669 高于 fixed 的 0.480（progressive 下优化更难）。长前缀桶
+  in-dist 0.676 仅 ~26 样本，噪声范围内（1.8σ），不作为信息泄漏或优势证据。
+- 按终局规则：进入**多种子阶段**——seeds=5（1..5）× 双臂，prefix_parity progressive
+  配置不变；判优 = `publishable(per_seed_adaptive, per_seed_fixed)`（主指标 OOD acc），
+  过门 → RESULTS.md PROVEN 追加行 + GRADUATION-CANDIDATE；不过 → 筛查区留痕。
+- 结果（跑完填）：（待填）
