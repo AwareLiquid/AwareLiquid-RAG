@@ -149,3 +149,16 @@
   落盘即生效）：#4 若 G3 再败 → P0' 判 REJECTED（机制级阴性结果，归档筛查区/
   backlog 留痕），类脑主轴转 latent-workspace recurrent（固定深度循环，不依赖
   可学习停步）；若全过 → 多种子放行。**
+
+### R2 screening #4 配置（2026-09-17 01:03 落盘，先于运行；阶梯终局步）
+
+- 任务/机制：prefix_parity + **progressive-reveal**。adaptive 臂重构：trunk 以第 1 步
+  reveal 掩码（R_1=⌈L/8⌉ 位）跑一次；workspace 迭代 k 的注意力仅见前 R_k=⌈k/8·L⌉ 位；
+  读出池化仅覆盖已 reveal 前缀。查询标记随其位置一起被 reveal——标记未 reveal 前模型
+  无从知晓 q，只能继续迭代。fixed 臂保持 screening #3 原样（全量单步），作全信息基线。
+- 其余配置继承 #3（6000 步、长度课程、halt bias -2、d=96/K=8/β=0.05/Geometric(0.25)、
+  batch 64、CPU 确定性）；判据 G1–G4 不变；诊断同 #3（q 分桶 acc/steps）。
+- 终局规则（#3 时已落盘，重申）：#4 全过 → 多种子放行；G3 再败 → P0' REJECTED
+  （机制级阴性结果），主轴转 latent-workspace recurrent（固定深度循环）。
+- 运行前防线：py_compile + 双臂 150 步 infra selfcheck。
+- 结果（跑完填）：（待填）

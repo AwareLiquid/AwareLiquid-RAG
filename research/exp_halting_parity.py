@@ -134,7 +134,7 @@ class HaltingNet(nn.Module):
         summed = (h * mask.unsqueeze(-1)).sum(1)
         return summed / mask.sum(1, keepdim=True).clamp(min=1)
 
-    def forward(self, x, mask, qpos=None):
+    def forward(self, x, mask, qpos=None, progressive=False):
         n, L = x.shape
         pos = torch.arange(L, device=x.device).unsqueeze(0).expand(n, -1)
         emb = self.tok(x)
@@ -142,17 +142,24 @@ class HaltingNet(nn.Module):
             marker = torch.zeros_like(emb)
             marker[torch.arange(n), qpos] = 1.0
             emb = emb + marker * self.tok.weight[QUERY_ID]
-        h = self.trunk(emb + self.pos(pos), mask)
         if not self.adaptive:
+            h = self.trunk(emb + self.pos(pos), mask)
             return self.head(self._pool(self.workspace(h, mask), mask)), None
+
+        def reveal_mask(k: int):
+            # progressive-reveal：迭代 k 只见前 ⌈k/K·L⌉ 位（single-step 结构性不足）。
+            R = -(-k * L // K_STEPS)  # ceil div, R ∈ [1, L]
+            ar = torch.arange(L, device=x.device).unsqueeze(0)
+            return (ar < R) & mask
+
+        state = self.trunk(emb + self.pos(pos), reveal_mask(1))
         acc = torch.zeros(n, 2)
         lam_list, p_list = [], []
         prev = torch.ones(n)
-        state = h
-        pooled = self._pool(state, mask)
-        for _ in range(K_STEPS):
-            state = self.workspace(state, mask)
-            pooled = self._pool(state, mask)
+        for k in range(2, K_STEPS + 1):
+            m_k = reveal_mask(k)
+            state = self.workspace(state, m_k)
+            pooled = self._pool(state, m_k)
             lam = torch.sigmoid(self.halt(pooled)).squeeze(-1)  # (n,)
             lam_list.append(lam)
             p_k = lam * prev
@@ -207,7 +214,9 @@ def evaluate(model, gen, lo, hi, n, task):
         mean_steps = None
         if halt is not None:
             lam_list, p_list, p_remain = halt
-            ks = torch.arange(1, K_STEPS + 1, dtype=torch.float32).unsqueeze(1)
+            # progressive 模式停步决策从 k=2 开始（p_list 少一行），对齐到最后 len 步。
+            first_k = K_STEPS - p_list.shape[0] + 1
+            ks = torch.arange(first_k, K_STEPS + 1, dtype=torch.float32).unsqueeze(1)
             steps = (p_list * ks).sum(0).add(p_remain * K_STEPS)
             mean_steps = float(steps.mean().item())
             if buckets is not None:
