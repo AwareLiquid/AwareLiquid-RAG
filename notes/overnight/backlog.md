@@ -45,21 +45,28 @@
 - 运行计划：本机 `PYTHONHASHSEED=1 .venv/bin/python benchmarks/bench_adapter.py --fake`（分钟级）。
 - 状态：**已闭环（2026-09-11 R0）**：输出与旧日志逐字节一致（`benchmarks/results/r0_bench_fake_20260911_r1.log`）。
 
-## P0' — 自适应停止（PonderNet 式 halt）合成任务消融 [SCREENING NO-GO ×3（至 2026-09-17）；#4=阶梯终局]
+## P0' — 自适应停止（PonderNet 式 halt）合成任务消融 [REJECTED 2026-09-17（机制级阴性，5 seeds）]
 
-- 预注册：`docs/PREREGISTRATION.md` 附录 R2 及 screening 序节；脚本 `research/exp_halting_parity.py`。
-- screening #1（parity, 1200 步）：NO-GO——两臂 chance、halt 坍缩（详见附录与晨报 09-16 档）。
-- screening #2（parity, 6000 步+课程+bias）：NO-GO——容量校准无效，loss 卡 ln2。
-- **screening #3（prefix_parity, 6000 步）：NO-GO ×3，但 G2 首次 PASS**（证据
-  `benchmarks/results/r2_halting_prefix_20260917_r3.log`）：任务学会了（fixed in-dist
-  0.666、短前缀桶 0.83-0.87），可 halt 仍坍缩（mean_steps 1.028）——任务 CE 下额外
-  迭代无净收益，早停是 halt 头的理性行为。分桶：fixed 长前缀桶 0.324 vs adaptive
-  0.588（单 seed，仅方向性）。
-- **下轮 = screening #4（阶梯终局步）**：progressive-reveal——迭代 k 只能看到前
-  ⌈k/K·L⌉ 位，结构上强制"单步不足以答长前缀"；配置下轮落盘后运行。
-  **结局规则（已在附录落盘生效）**：#4 G3 再败 → P0' REJECTED（机制级阴性结果），
-  主轴转 latent-workspace recurrent（固定深度循环，不依赖可学习停步）；全过 → 多种子。
-- 依赖：无（纯 torch 合成数据，全离线）；与 R1 人工裁定全解耦。
+- 全链留痕：4 轮 screening（#1 parity→NO-GO；#2 +课程/6k 步→NO-GO；#3 prefix-parity→
+  G2 首过但 halt 坍缩；#4 progressive-reveal→G1–G4 全过）+ 5 seeds 多种子终判。
+- **终判 REJECTED**：`publishable()` 判负——OOD acc adaptive **0/5 胜** fixed
+  （配对符号检验 p=0.0625；adaptive [0.547,0.551,0.502,0.555,0.502] vs fixed
+  [0.553,0.572,0.514,0.566,0.537]）；mean_steps 各种子 ≈2.00（固定预算，非逐例自适应）。
+  已入 `docs/RESULTS.md` 筛查区（REJECTED 2026-09-17 行）。
+- 结论：本规模/本读出结构下，可学习停步无净收益——"多想"必须在结构上被强制
+  （progressive-reveal 做到了），但强制后的统一 2 步预算说明 halt 头学到的仍是
+  策略常量而非按需分配。**可作为 M1 类结论引用（过 E0 门的阴性结果）。**
+- 可复用资产：`research/exp_halting_parity.py`（双臂双任务确定性骨架，后续方向直接复用）。
+
+## P0'' — 下一主轴：latent workspace recurrent（固定深度循环，Geiping 式）[IDEA→下轮 prereg]
+
+- 浮现理由（2026-09-17，终局规则既定转向）：P0' 证明"可学习停步"在该 setup 无收益，
+  但 #4 同时证明**迭代本身有信息价值**（progressive reveal 下任务可学、深度可达）。
+  固定深度循环不做停步学习、直接测"latent 迭代深度 k vs 准确率/长度外推"的 dose-response，
+  是该轴下一个可证伪的最小实验，且完全复用 P0' 的任务与验收骨架。
+- 下轮动作：写新预注册（核心判据：depth=k 曲线在合成 prefix-parity 上的单调性 +
+  k 增益的多种子显著性；"更深度不涨"同样是有效判负）→ 单 seed 冒烟 → 多种子。
+- 依赖：无（纯 torch 合成数据，全离线；预计与 P0' 同量级，本机可承受）。
 
 ## P2 — 工程：Kaggle 通道验证（CLI 安装 + 凭证 + CPU notebook hello-world）[IDEA]
 
@@ -83,4 +90,4 @@
 
 - GRADUATION-CANDIDATE：（空）
 - GRADUATED：（空）
-- REJECTED：（空）
+- REJECTED：P0' 自适应停止（PonderNet 式 halt）——2026-09-17，5 seeds 0/5，p=0.0625（筛查区有行；详见 P0' 节，此处为唯一权威看板，其上方 P0'' 节内不再重复维护）
