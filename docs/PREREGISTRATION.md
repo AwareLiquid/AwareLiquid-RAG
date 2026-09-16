@@ -81,4 +81,12 @@
     预计 >60 min 则多种子按算力政策转 Kaggle）；任一不过 → 如实归档原因，
     下一轮修后再筛；修改判据本身须预注册修订 + 人工确认。
 - 运行计划：本机冒烟（≤1h 内）；结果归档 `benchmarks/results/r2_halting_smoke_<日期>_r<轮>.{json,log}`。
-- 结果（跑完填）：（待填）数字 + screening go/no-go 逐条判定。
+- 结果（跑完填）：**screening NO-GO（2026-09-16，seed=1，1200 步）**。G1 PASS——两次
+  arm-fixed 运行全部科学指标逐比特一致（indist 0.494140625 / ood 0.501953125），仅
+  `wall_s` 计时字段差 0.1s（仪表量，非科学指标）；G2 FAIL——fixed 0.494、adaptive
+  0.508，均 < 0.55（chance 水平，loss 停在 ~0.70 ≈ ln2，未学到信号）；G3 FAIL——
+  mean_steps 1.010 < 1.3（halt 坍缩到第 1 步）；G4 PASS——fixed 22.6s / adaptive
+  90.9s ≤ 10 min（2臂×5seeds ≈ 9.5 min，多种子可留在本机）。按预注册 G2 处置条款
+  判"任务/容量欠配"，下一轮调容量/任务形式后重筛（不构成预注册修订）；证据
+  `benchmarks/results/r2_halting_smoke_20260916_r1.log`（首次尝试的池化 bug 另存
+  `*_attempt1_poolingbug.log` 留痕）。

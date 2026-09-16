@@ -109,27 +109,36 @@ class HaltingNet(nn.Module):
         if adaptive:
             self.halt = nn.Linear(D_MODEL, 1)
 
+    @staticmethod
+    def _pool(h, mask):
+        # masked mean over sequence -> one vector per example (readout + halt both
+        # act per example, not per position).
+        summed = (h * mask.unsqueeze(-1)).sum(1)
+        return summed / mask.sum(1, keepdim=True).clamp(min=1)
+
     def forward(self, x, mask):
         n, L = x.shape
         pos = torch.arange(L, device=x.device).unsqueeze(0).expand(n, -1)
         h = self.trunk(self.tok(x) + self.pos(pos), mask)
         if not self.adaptive:
-            return self.head(self.workspace(h, mask)), None
+            return self.head(self._pool(self.workspace(h, mask), mask)), None
         halted = torch.zeros(n, dtype=torch.bool)
         acc = torch.zeros(n, 2)
         lam_list, p_list = [], []
         prev = torch.ones(n)
         state = h
+        pooled = self._pool(state, mask)
         for _ in range(K_STEPS):
             state = self.workspace(state, mask)
-            lam = torch.sigmoid(self.halt(state)).squeeze(-1)  # (n,)
+            pooled = self._pool(state, mask)
+            lam = torch.sigmoid(self.halt(pooled)).squeeze(-1)  # (n,)
             lam_list.append(lam)
             p_k = lam * prev
             p_list.append(p_k)
-            acc = acc + p_k.unsqueeze(1) * self.head(state)
+            acc = acc + p_k.unsqueeze(1) * self.head(pooled)
             prev = prev * (1 - lam)
         p_remain = prev  # 未停质量留在第 K 步
-        acc = acc + p_remain.unsqueeze(1) * self.head(state)
+        acc = acc + p_remain.unsqueeze(1) * self.head(pooled)
         return acc, (torch.stack(lam_list, 0), torch.stack(p_list, 0), p_remain)
 
 

@@ -1,0 +1,17 @@
+{
+  "K": 8,
+  "arm": "adaptive",
+  "beta": 0.05,
+  "d_model": 96,
+  "exp": "r2_halting_parity",
+  "indist_acc": 0.5078125,
+  "mean_steps": 1.0097378492355347,
+  "ood_acc": 0.501953125,
+  "prior_p": 0.25,
+  "python_hash_seed": "0",
+  "seed": 1,
+  "steps": 1200,
+  "torch_version": "2.13.0",
+  "train_loss_last": 0.7656843066215515,
+  "wall_s": 90.9
+}
