@@ -59,6 +59,9 @@ def main() -> int:
     ap.add_argument("--self-consistency", type=int, default=1,
                     help="independent answer samples aggregated by majority vote (1=off)")
     ap.add_argument("--cot", action="store_true", help="chain-of-thought on multi/comparison questions")
+    ap.add_argument("--retrieval-backend", choices=("lexical", "hybrid"), default="lexical",
+                    help="retrieval arm under test; hybrid (e5 dense + BM25 + RRF) is the "
+                         "research arm and needs the embedder download on first use")
     args = ap.parse_args()
 
     corpus = load_corpus()
@@ -68,13 +71,14 @@ def main() -> int:
 
     mock = os.environ.get("AWARELIQUID_LLM_BACKEND") == "mock"
     print(f"corpus: {len(corpus)} documents | questions: {len(questions)}")
-    print(f"backend: {'MOCK (answers meaningless)' if mock else 'REAL model'}\n")
+    print(f"backend: {'MOCK (answers meaningless)' if mock else 'REAL model'} "
+          f"| retrieval: {args.retrieval_backend}\n")
 
     if args.self_consistency > 1:
         print(f"self-consistency: {args.self_consistency} samples per question, majority vote\n")
     agent = MemoryQAAgent(
         config=RetrievalConfig(
-            retrieval_backend="lexical",
+            retrieval_backend=args.retrieval_backend,
             self_consistency=args.self_consistency,
             cot_multi=args.cot,
         ),

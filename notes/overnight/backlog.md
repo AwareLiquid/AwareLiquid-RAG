@@ -15,26 +15,43 @@
 > - 证据纪律：`docs/RESULTS.md` 为唯一事实源，只追加不改既有判定行；单 seed 结果只入筛查区；
 >   新结果 JSON/日志入 `benchmarks/results/`（命名 `<实验>_<日期>_r<轮>.{json,log}`）；提交动词 `prereg:→bench:→results:→docs:`。
 
-## P0 — R1 multi-seed 消融：lexical vs hybrid（含 multi-query），100 题标注集 [SCREENING]
+## P0 — R1 multi-seed 消融：lexical vs hybrid（含 multi-query），100 题标注集 [BLOCKED-HUMAN 2026-09-16]
 
 - 动机：主干上真正的首个"能力对比"问题——hybrid（dense+e5+BM25+RRF）相对纯 lexical 到底是提升还是负担？
-  仓库里只有 8 题 `--fake` 筛查计数（7/8→8/8），从未在 100 题集上跑过，更没过 `publishable()` 门。
+  仓库里只有 8 题 `--fake` 筛查计数（7/8→8/8），从未在标注集上跑过，更没过 `publishable()` 门。
   这是所有类脑模块毕业时都要对照的基线，没有它一切"提升"都无从谈起。
 - 预注册：`docs/PREREGISTRATION.md` 附录 R1（2026-09-11，已落盘）。
-- 两臂：arm-a = `retrieval_backend="lexical"`；arm-b = `retrieval_backend="hybrid"`（向量 path；需 e5 模型下载）。
-- 判据：100 题 × ≥3 seeds，指标 answer accuracy（mock 后端下为 pipeline 有效性代理指标，如实标注）；
-  判优 = b 各 seed 均 ≥ a 且配对符号检验 p<0.05；判负 = b 未显著优于 a → hybrid 维持 research-only，不动默认路径。
-- 运行计划：本机先跑单 seed 超小冒烟（≤1h）；e5 下载 + 全量多 seed 若超 1h 则走 Kaggle CPU notebook（通道 UNVERIFIED→ 先验证通道）。
-- 状态：PREREG 已落盘；SCREENING 待跑。
+- **2026-09-16 冒烟发现两个硬阻塞（需人工裁定，见晨报）：**
+  1. **预注册题集无标注**：`data/questions/group_a/*.json` 100/100 题全部没有 `answer` 字段（竞赛题，
+     答案未随题下发）——预注册指标"answer accuracy vs 标注答案"在该题集上**不可计算**。
+     但仓库存在另一套完整标注集：`evals/questions.jsonl`（48 题、48 个金标、5 域、corpus 为现成 md，
+     `evals/run_eval.py` 驱动；其自述定位为"管线回归基线，非真实难度"）。
+  2. **mock 后端答案退化**：`MockChatClient` 只回第一个选项（代码+`evals/run_eval.py` 文档双重确认），
+     离线 accuracy 对检索质量不敏感（实测 mock 48 题 13/48=27.1%，即 echo-first 基线）。
+     有效对比必须真实 Qwen key 计费跑：48 题 ≈ 16.6 万 token/轮（mock 估算口径）。
+- 已完成的工程清偿：`evals/run_eval.py` 新增 `--retrieval-backend {lexical,hybrid}` 开关
+  （R1 两臂入口，mock 冒烟验证过）；e5 hybrid 臂可行性 = transformers 5.14.1 已装、HF 可达（首次需下 ~500MB 模型）。
+- 人工裁定项：**（a）换题集**——预注册题集 100 题无标注 → 改为 `evals/` 48 题标注集（即刻可跑）
+  或先造 100 题金标（长期更好，需标注工作）；**（b）计费授权**——是否允许用 `.env` 里的真实
+  Qwen key 跑 evals（每轮 ≈16.6 万 token）。两项都批 → 下轮改预注册附录（换题集 + 后端口径）后开跑。
+- 状态：**BLOCKED-HUMAN**（不占本机，不烧 API；等裁定）。
 
-## P1 — R0 回归锁：重跑 bench --fake，确认合并后行为与旧证据一致 [SCREENING]
+## P1 — R0 回归锁：重跑 bench --fake，确认合并后行为与旧证据一致 [REJECTED→已闭环 2026-09-11]
 
 - 动机：`overnight/loop` 建分支时把 `origin/main`（48 题评估管线 + 检索增强）与
   `origin/feat/evidence-governance`（8 题 bench + E0 门）合并，`bench_adapter.build_agent` 曾短暂损坏已修复。
   跑一次 `--fake` 单 seed，确认 `RESULT: PASS` 且数字与 `docs/RESULTS.md` PROVEN 表一致（recall@4 8/8、retention 8/8、1254 vs 22668）。
 - 判据：输出与 `benchmarks/results/bench_adapter_fake_20260906_r1.log` 关键行一致；不一致则开事故记录并修 bench，不动 RESULTS 既有行。
 - 运行计划：本机 `PYTHONHASHSEED=1 .venv/bin/python benchmarks/bench_adapter.py --fake`（分钟级）。
-- 状态：待跑（即本轮 R0）。
+- 状态：**已闭环（2026-09-11 R0）**：输出与旧日志逐字节一致（`benchmarks/results/r0_bench_fake_20260911_r1.log`）。
+
+## P0' — 下一轮默认方向：自适应停止（ACT/PonderNet 式 halt）合成任务冒烟 [IDEA→下轮 prereg]
+
+- 浮现理由（2026-09-16）：R1 因题集无标注 + mock 退化 + 计费未授权三重阻塞，按协议停止等人工；
+  类脑轴里唯一**自带金标、全离线、零 API 成本**的方向是合成任务上的自适应停止消融
+  （变量长度 parity/多步求和：模型必须学会"多想几步"，halt 头输出停步分布）。
+- 下一轮动作：写新预注册（`prereg:` 落盘判负标准）→ 单 seed 冒烟（≤1h 本机）→ 过了 screening 再谈多种子。
+- 依赖：无（纯 torch 合成数据）；与 R1 的人工资裁定全解耦。
 
 ## P2 — 工程：Kaggle 通道验证（CLI 安装 + 凭证 + CPU notebook hello-world）[IDEA]
 

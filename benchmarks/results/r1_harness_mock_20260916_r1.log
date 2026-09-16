@@ -1,0 +1,102 @@
+== smoke 1: default (lexical), full 48, mock ==
+corpus: 7 documents | questions: 48
+backend: MOCK (answers meaningless) | retrieval: lexical
+
+  !! e01  got=A    gold=B    事实查找
+  OK e02  got=A    gold=A    条款定位
+  !! e03  got=A    gold=B    条款定位
+  !! e04  got=A    gold=AD   多文档联合推理
+  !! e05  got=A    gold=B    公式计算
+  OK e06  got=A    gold=A    公式计算
+  !! e07  got=A    gold=AC   跨文档对比
+  !! e08  got=A    gold=AB   跨文档对比
+  !! e09  got=A    gold=B    公式计算
+  !! e10  got=A    gold=B    事实查找
+  !! e11  got=A    gold=B    事实查找
+  !! e12  got=A    gold=B    事实查找
+  !! e13  got=A    gold=B    事实查找
+  OK e14  got=A    gold=A    事实查找
+  !! e15  got=A    gold=AB   条款定位
+  !! e16  got=A    gold=B    条款定位
+  OK e17  got=A    gold=A    多文档联合推理
+  OK e18  got=A    gold=A    公式计算
+  !! e19  got=A    gold=B    事实查找
+  !! e20  got=A    gold=C    事实查找
+  !! e21  got=A    gold=AB   多文档联合推理
+  OK e22  got=A    gold=A    条款定位
+  !! r01  got=A    gold=B    时限要求
+  !! r02  got=A    gold=C    时限要求
+  !! r03  got=A    gold=B    适用范围
+  !! r04  got=A    gold=C    条款定位
+  !! r05  got=A    gold=ABC  适用范围
+  !! r06  got=A    gold=D    事实查找
+  OK r07  got=A    gold=A    事实查找
+  !! r08  got=A    gold=B    事实查找
+  OK r09  got=A    gold=A    事实查找
+  !! r10  got=A    gold=ABD  适用范围
+  OK s01  got=A    gold=A    事实查找
+  !! s02  got=A    gold=B    事实查找
+  !! s03  got=A    gold=C    事实查找
+  OK s04  got=A    gold=A    事实查找
+  !! s05  got=A    gold=B    事实查找
+  !! s06  got=A    gold=AB   跨文档对比
+  !! s07  got=A    gold=B    观点与事实
+  !! s08  got=A    gold=B    公式计算
+  !! s09  got=A    gold=C    事实查找
+  !! s10  got=A    gold=AB   跨文档对比
+  !! x01  got=A    gold=B    观点与事实
+  OK x02  got=A    gold=A    公式计算
+  !! x03  got=A    gold=AB   多文档联合推理
+  !! x04  got=A    gold=B    多文档联合推理
+  OK x05  got=A    gold=A    事实查找
+  OK x06  got=A    gold=A    公式计算
+
+=== accuracy: 13/48 (27.1%) ===
+
+  by question type:
+    事实查找             6/19  (32%)
+    公式计算             4/7  (57%)
+    多文档联合推理          1/5  (20%)
+    时限要求             0/2  (0%)
+    条款定位             2/6  (33%)
+    观点与事实            0/2  (0%)
+    跨文档对比            0/4  (0%)
+    适用范围             0/3  (0%)
+
+  by answer format:
+    mcq    9/28  (32%)
+    multi  0/10  (0%)
+    tf     4/10  (40%)
+
+  tokens: 166,309 (prompt 166,242 + completion 67)
+  avg/question: 3465
+  score: 26.81  = 100 x 0.271 x (0.7 + 0.3 x 0.9667)
+
+  NOTE: mock backend — this run only proves the harness works.
+
+== smoke 2: --retrieval-backend lexical --limit 4, mock ==
+corpus: 7 documents | questions: 4
+backend: MOCK (answers meaningless) | retrieval: lexical
+
+  !! e01  got=A    gold=B    事实查找
+  OK e02  got=A    gold=A    条款定位
+  !! e03  got=A    gold=B    条款定位
+  !! e04  got=A    gold=AD   多文档联合推理
+
+=== accuracy: 1/4 (25.0%) ===
+
+  by question type:
+    事实查找             0/1  (0%)
+    多文档联合推理          0/1  (0%)
+    条款定位             1/2  (50%)
+
+  by answer format:
+    mcq    0/1  (0%)
+    multi  0/1  (0%)
+    tf     1/2  (50%)
+
+  tokens: 18,011 (prompt 18,004 + completion 7)
+  avg/question: 4503
+  score: 24.97  = 100 x 0.250 x (0.7 + 0.3 x 0.9964)
+
+  NOTE: mock backend — this run only proves the harness works.
