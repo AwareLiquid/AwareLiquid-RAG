@@ -1,0 +1,20 @@
+{
+  "K": 8,
+  "arm": "fixed",
+  "beta": 0.05,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "d_model": 96,
+  "exp": "r2_halting_parity",
+  "halt_bias_init": null,
+  "indist_acc": 0.51171875,
+  "mean_steps": null,
+  "ood_acc": 0.482421875,
+  "prior_p": 0.25,
+  "python_hash_seed": "0",
+  "seed": 1,
+  "steps": 6000,
+  "torch_version": "2.13.0",
+  "train_loss_last": 0.6828786134719849,
+  "wall_s": 76.8
+}

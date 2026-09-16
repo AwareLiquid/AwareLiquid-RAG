@@ -100,3 +100,17 @@
   screening #1 实测仅该字段有 0.1s 差）。
 - 通过标准仍为 G1–G4 全过；若 G2 再败，下一档升级为任务形式更换（累积取模和类，
   迭代步有独立梯度贡献），同样属于本条款授权范围。
+
+### R2 screening #2 结果（2026-09-17 00:25 判定）
+
+- **NO-GO ×2**（配置见上方 00:03 落盘记录；证据 `benchmarks/results/r2_halting_smoke_20260917_r2.log`）。
+- G1 PASS（wall_s 除外全字段一致）；G2 FAIL——fixed in-dist 0.512 / OOD 0.482，
+  adaptive 0.488 / 0.502，loss 仍卡 ln2 附近，6000 步 + 长度课程未产生学习信号；
+  G3 FAIL——mean_steps 1.003（bias -2 只延迟了坍缩，未阻止）；G4 PASS——fixed 89s /
+  adaptive 348s ≤ 10 min（2臂×5seeds ≈ 37 min，仍可留本机）。
+- 按已落盘的升级条款：**下一档 = 任务形式更换**（screening #3）：改为"查询位置前缀
+  parity"（串 + 查询位 q，答 bits[0:q] 的异或；每个迭代步对应明确的前缀扩展增益，
+  难度随 q 连续变化，halt 有真实的"多想一步"收益结构）。配置于下轮运行前落盘。
+- 过程事故留痕：00:03 预注册 commit 中的脚本 def 行损坏（我的编辑事故，运行全部
+  IndentationError，未产出指标，traceback 日志因轮内日志改名操作未保留，git 历史
+  中损坏版本可考）；修复后 attempt B 正常运行。

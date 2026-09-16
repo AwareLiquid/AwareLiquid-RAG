@@ -63,7 +63,8 @@ LR = 1e-3
 BATCH = 64
 
 
-def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):    lens = torch.randint(lo, hi + 1, (n,), generator=gen)
+def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):
+    lens = torch.randint(lo, hi + 1, (n,), generator=gen)
     maxlen = int(lens.max())
     x = torch.zeros(n, maxlen, dtype=torch.long)
     mask = torch.zeros(n, maxlen, dtype=torch.bool)
