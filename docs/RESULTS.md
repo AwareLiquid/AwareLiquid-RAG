@@ -45,6 +45,7 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
 | run 目录 JSON sidecar 哈希（提交于 f459eca） | 66 处失配 | **CORRECTED (2026-09-06)**——sidecar 哈希的是 canonical compact JSON，落盘是 pretty-print 版，内容语义相同（逐一验证 canonical 哈希吻合后重写为磁盘字节哈希，0 处遗留失配）；管线出处：`scripts/bootstrap_a1_terra_r1.py` 的 `sidecar()` 调用点混用 `object_hash` 与 `raw_hash` | `docs/runs/`（修复后 `scripts/check_results_refs.py` PASS） |
 | R2 自适应停止（PonderNet 式 halt，progressive-reveal prefix-parity，5 seeds 配对）：adaptive vs fixed 的 OOD / in-dist accuracy | adaptive OOD [0.547, 0.551, 0.502, 0.555, 0.502] vs fixed [0.553, 0.572, 0.514, 0.566, 0.537]——**adaptive 0/5 胜**（配对符号检验 p=0.0625）；in-dist 1/5 胜（p=0.375）；双臂均非双峰 | **REJECTED (2026-09-17)**——`publishable()` 判负：progressive-reveal 下 halt 学到固定 2 步预算（各种子 mean_steps≈2.00），准确率一致性地不低于全信息单步基线；机制级阴性结果：本规模下可学习停步无净收益 | `benchmarks/results/r2_halting_prefix_20260917_multi_summary.json`、`benchmarks/results/r2_halting_prefix_20260917_multi.log`（协议与 screening 链：`docs/PREREGISTRATION.md` 附录 R2） |
 | R3 latent recurrent depth（固定深度循环 k∈{1,2,4,8}，prefix-parity，k=1/k=8 各 5 seeds 配对）：k8 vs k1 的 OOD accuracy | k8 [0.523, 0.559, 0.535, 0.541, 0.514] vs k1 [0.553, 0.572, 0.514, 0.566, 0.537]——**1/5 胜**（p=0.375）；OOD 曲线平坦（k=1/2/4/8 均值 0.548/0.548/0.551/0.534），in-dist 在 k=2 见顶（0.655→0.695→0.697→0.676） | **REJECTED (2026-09-17)**——`publishable()` 判负：深度的收益限于训练分布内拟合，不转化为长度外推；固定步数预算下 k=8 优化更难。阴性结果：共享块循环深度在本任务/规模无净收益 | `benchmarks/results/r3_latent_depth_20260917_summary.json`、`benchmarks/results/r3_latent_depth_20260917.log`（协议：`docs/PREREGISTRATION.md` 附录 R3） |
+| R4 测试场阳性对照（层级分块聚合 vs 平铺池化，prefix-parity，各 5 seeds 配对）：hier vs flat 的 OOD accuracy | hier [0.576, 0.539, 0.570, 0.594, 0.504] vs flat [0.553, 0.572, 0.514, 0.566, 0.537]——**3/5 胜**（p=1.0）；长前缀桶均值 0.511 vs 0.486（重叠噪声） | **测试场无区分度 (2026-09-17)**——构造上应当分离的阳性对照都无法显著胜出，`publishable()` 判负。按预注册结局规则：合成测试场（pooled-readout 小模型 × prefix-parity）对机制研究**冻结**；同夜 R2/R3/R4 三连阴性共同构成该判断 | `benchmarks/results/r4_arch_control_20260917_summary.json`、`benchmarks/results/r4_arch_control_20260917.log`（协议：`docs/PREREGISTRATION.md` 附录 R4） |
 
 ## What we do NOT claim（负面声明）
 
@@ -126,3 +127,7 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
     **REJECTED**——k=8 vs k=1 OOD 仅 1/5 胜（p=0.375），OOD 曲线平坦、in-dist
     k=2 见顶：深度收益不转化为长度外推。筛查区新行留痕；同夜连续两个类脑机制
     阴性结果（R2 停步、R3 深度）出自同一可复现骨架 `research/exp_halting_parity.py`。
+
+- **2026-09-17 续（R4）**：阳性对照（层级分块聚合）亦判负——合成测试场按预注册
+  规则**冻结**，循环转入"需人工判定"停靠点：后续唯一有区分度的路径是真实基准
+  （48 题标注集 + 真实 Qwen key），决策包见当夜晨报。
