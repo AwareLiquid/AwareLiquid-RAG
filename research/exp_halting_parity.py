@@ -134,7 +134,7 @@ class HaltingNet(nn.Module):
         summed = (h * mask.unsqueeze(-1)).sum(1)
         return summed / mask.sum(1, keepdim=True).clamp(min=1)
 
-    def forward(self, x, mask, qpos=None, progressive=False):
+    def forward(self, x, mask, qpos=None, depth: int = 1):
         n, L = x.shape
         pos = torch.arange(L, device=x.device).unsqueeze(0).expand(n, -1)
         emb = self.tok(x)
@@ -144,7 +144,9 @@ class HaltingNet(nn.Module):
             emb = emb + marker * self.tok.weight[QUERY_ID]
         if not self.adaptive:
             h = self.trunk(emb + self.pos(pos), mask)
-            return self.head(self._pool(self.workspace(h, mask), mask)), None
+            for _ in range(max(1, depth)):  # R3: 固定深度循环（k=1 与 R2 fixed 同构）
+                h = self.workspace(h, mask)
+            return self.head(self._pool(h, mask)), None
 
         def reveal_mask(k: int):
             # progressive-reveal：迭代 k 只见前 ⌈k/K·L⌉ 位（single-step 结构性不足）。
@@ -190,7 +192,7 @@ def _bucket_of(q: torch.Tensor):
                        torch.where(q <= 24, torch.ones_like(q), torch.full_like(q, 2)))
 
 
-def evaluate(model, gen, lo, hi, n, task):
+def evaluate(model, gen, lo, hi, n, task, depth: int = 1):
     model.eval()
     qpos = None
     if task == "parity":
@@ -198,7 +200,7 @@ def evaluate(model, gen, lo, hi, n, task):
     else:
         x, mask, qpos, y = make_prefix_batch(gen, lo, hi, n)
     with torch.no_grad():
-        logits, halt = model(x, mask, qpos)
+        logits, halt = model(x, mask, qpos, depth=depth)
         hit = (logits.argmax(1) == y)
         acc = hit.float().mean().item()
         buckets = None
@@ -232,11 +234,14 @@ def evaluate(model, gen, lo, hi, n, task):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", choices=("parity", "prefix_parity"), default="parity")
-    ap.add_argument("--arm", choices=("fixed", "adaptive"), required=True)
+    ap.add_argument("--arm", choices=("fixed", "adaptive"), default="fixed")
+    ap.add_argument("--depth", type=int, default=1, help="fixed-depth loop count (R3); arm must be fixed")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--steps", type=int, default=1200)
     ap.add_argument("--out", type=str, required=True)
     args = ap.parse_args()
+    if args.arm == "adaptive" and args.depth != 1:
+        ap.error("--depth applies to the fixed arm only (progressive adaptive is K=8 by design)")
 
     torch.use_deterministic_algorithms(True)
     torch.set_num_threads(2)
@@ -257,7 +262,7 @@ def main() -> int:
             x, mask, y = make_batch(gen_data, lo, hi, BATCH)
         else:
             x, mask, qpos, y = make_prefix_batch(gen_data, lo, hi, BATCH)
-        logits, halt = model(x, mask, qpos)
+        logits, halt = model(x, mask, qpos, depth=args.depth)
         loss = nn.functional.cross_entropy(logits, y)
         if halt is not None:
             lam_list, p_list, p_remain = halt
@@ -269,12 +274,13 @@ def main() -> int:
             print(f"step {step:5d} loss {loss.item():.4f}", flush=True)
     wall = time.time() - t0
 
-    indist, mean_steps, buckets_in = evaluate(model, gen_eval_in, 8, 32, 512, args.task)
-    ood, _, buckets_ood = evaluate(model, gen_eval_ood, 40, 64, 512, args.task)
+    indist, mean_steps, buckets_in = evaluate(model, gen_eval_in, 8, 32, 512, args.task, args.depth)
+    ood, _, buckets_ood = evaluate(model, gen_eval_ood, 40, 64, 512, args.task, args.depth)
     result = {
-        "exp": "r2_halting_parity",
+        "exp": "r2_halting_parity" if args.depth == 1 else "r3_latent_depth",
         "task": args.task,
         "arm": args.arm,
+        "depth": args.depth,
         "seed": args.seed,
         "steps": args.steps,
         "d_model": D_MODEL,

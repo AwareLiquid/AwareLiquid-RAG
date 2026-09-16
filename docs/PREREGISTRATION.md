@@ -184,3 +184,23 @@
   无逐例自适应证据。
 - 按终局规则：P0' REJECTED（机制级阴性结果，RESULTS.md 筛查区留痕）；主轴转
   latent-workspace recurrent（固定深度循环，不依赖可学习停步）。
+
+## R3：latent workspace recurrent depth（固定深度循环）dose-response — 2026-09-17
+
+- 动机：P0' 判负留下的问题——迭代的信息价值已被 progressive-reveal 证明（任务可学），
+  但"可学习停步"无收益。本轮去掉停步学习，直接测固定深度 k 的 dose-response：
+  共享 workspace block 循环 k 次（Geiping 式 latent recurrent depth），深度是否换来能力。
+- 任务/配置：prefix_parity（复用 R2 终版）；6000 步、长度课程、trunk 恒 1 次不循环、
+  d=96、batch 64、AdamW 1e-3、CPU 确定性；k ∈ {1, 2, 4, 8}，k=1 与 R2 fixed 臂同构
+  （跨轮确定性对账点：seed 1 k=1 应逐字节复现 R2 multi `fixed_s1` 数字）。
+- 预注册判据（跑之前写死）：
+  - 主门：`publishable(per_seed_k8, per_seed_k1)` on OOD acc（k∈{1,8} 各 5 seeds，
+    非双峰、配对符号检验 p<0.05）→ 过门 = 「深度有益」，入 PROVEN、模块标
+    GRADUATION-CANDIDATE 候选；不过 = **REJECTED**（阴性：固定深度循环在本任务/
+    规模无净收益），入筛查区，轴转 P3 次选。
+  - 曲线诊断（非门）：k∈{2,4} 各 3 seeds 的单调性趋势。
+  - 沿用门：G1 确定性（k=1 seed1 复现 R2 档案；wall_s 除外）；G2 各臂 in-dist ≥ 0.55；
+    G4 单 run wall ≤ 10 min。
+- 运行计划：py_compile + 150 步 smoke（k∈{1,8}）→ 全量 ~53 min 本机（≤1h 内），
+  先门后曲线；超时则曲线臂顺延。归档 `benchmarks/results/r3_latent_depth_<日期>_k{k}_s{seed}.json`。
+- 结果（跑完填）：（待填）
