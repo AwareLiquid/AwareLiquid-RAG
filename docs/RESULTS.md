@@ -44,6 +44,7 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
 | 修复前 bench `--fake` 两次运行 8/8 与 7/8 互相矛盾 | — | **RETRACTED (2026-09-06)**——根因：`benchmarks/bench_adapter.py` 的 `LexicalEncoder` 用内建 `hash()`，盐随进程随机；两值均为随机盐的运气，不代表系统能力 | 无留档（修复前输出未保存），仅本行记录；修复后日志见 `benchmarks/results/` |
 | run 目录 JSON sidecar 哈希（提交于 f459eca） | 66 处失配 | **CORRECTED (2026-09-06)**——sidecar 哈希的是 canonical compact JSON，落盘是 pretty-print 版，内容语义相同（逐一验证 canonical 哈希吻合后重写为磁盘字节哈希，0 处遗留失配）；管线出处：`scripts/bootstrap_a1_terra_r1.py` 的 `sidecar()` 调用点混用 `object_hash` 与 `raw_hash` | `docs/runs/`（修复后 `scripts/check_results_refs.py` PASS） |
 | R2 自适应停止（PonderNet 式 halt，progressive-reveal prefix-parity，5 seeds 配对）：adaptive vs fixed 的 OOD / in-dist accuracy | adaptive OOD [0.547, 0.551, 0.502, 0.555, 0.502] vs fixed [0.553, 0.572, 0.514, 0.566, 0.537]——**adaptive 0/5 胜**（配对符号检验 p=0.0625）；in-dist 1/5 胜（p=0.375）；双臂均非双峰 | **REJECTED (2026-09-17)**——`publishable()` 判负：progressive-reveal 下 halt 学到固定 2 步预算（各种子 mean_steps≈2.00），准确率一致性地不低于全信息单步基线；机制级阴性结果：本规模下可学习停步无净收益 | `benchmarks/results/r2_halting_prefix_20260917_multi_summary.json`、`benchmarks/results/r2_halting_prefix_20260917_multi.log`（协议与 screening 链：`docs/PREREGISTRATION.md` 附录 R2） |
+| R3 latent recurrent depth（固定深度循环 k∈{1,2,4,8}，prefix-parity，k=1/k=8 各 5 seeds 配对）：k8 vs k1 的 OOD accuracy | k8 [0.523, 0.559, 0.535, 0.541, 0.514] vs k1 [0.553, 0.572, 0.514, 0.566, 0.537]——**1/5 胜**（p=0.375）；OOD 曲线平坦（k=1/2/4/8 均值 0.548/0.548/0.551/0.534），in-dist 在 k=2 见顶（0.655→0.695→0.697→0.676） | **REJECTED (2026-09-17)**——`publishable()` 判负：深度的收益限于训练分布内拟合，不转化为长度外推；固定步数预算下 k=8 优化更难。阴性结果：共享块循环深度在本任务/规模无净收益 | `benchmarks/results/r3_latent_depth_20260917_summary.json`、`benchmarks/results/r3_latent_depth_20260917.log`（协议：`docs/PREREGISTRATION.md` 附录 R3） |
 
 ## What we do NOT claim（负面声明）
 
@@ -120,3 +121,8 @@ docs/runs/、幻灯片、对外表述）与本文件冲突时，**以本文件�
     确定性、progressive-reveal 开关）；后续 latent-recurrent 方向直接复用
     其合成任务与验收骨架。
   - 无 RESULTS.md 既有判定行改动；本节与筛查区新行均为追加。
+
+- **2026-09-17 续**：R3「latent recurrent depth」（固定深度循环）5 seeds 判
+    **REJECTED**——k=8 vs k=1 OOD 仅 1/5 胜（p=0.375），OOD 曲线平坦、in-dist
+    k=2 见顶：深度收益不转化为长度外推。筛查区新行留痕；同夜连续两个类脑机制
+    阴性结果（R2 停步、R3 深度）出自同一可复现骨架 `research/exp_halting_parity.py`。

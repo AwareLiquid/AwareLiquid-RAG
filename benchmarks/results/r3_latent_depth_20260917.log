@@ -1,0 +1,1162 @@
+== R3 dose-response: k in {1,2,4,8}, prefix_parity, 6000 steps ==
+== k=1 seed 1 ==
+step     1 loss 0.6785
+step   300 loss 0.4014
+step   600 loss 0.3284
+step   900 loss 0.2430
+step  1200 loss 0.2216
+step  1500 loss 0.1632
+step  1800 loss 0.2475
+step  2100 loss 0.2275
+step  2400 loss 0.3150
+step  2700 loss 0.1804
+step  3000 loss 0.1968
+step  3300 loss 0.1953
+step  3600 loss 0.2325
+step  3900 loss 0.2537
+step  4200 loss 0.3507
+step  4500 loss 0.4740
+step  4800 loss 0.4692
+step  5100 loss 0.4103
+step  5400 loss 0.5331
+step  5700 loss 0.4626
+step  6000 loss 0.4796
+{
+  "exp": "r2_halting_parity",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 1,
+  "seed": 1,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.4796164929866791,
+  "indist_acc": 0.666015625,
+  "ood_acc": 0.552734375,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.8275862336158752
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5609756112098694
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.3235294222831726
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.8611111044883728
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.517241358757019
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.49248120188713074
+    }
+  },
+  "wall_s": 81.4,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=1 seed 2 ==
+step     1 loss 0.8519
+step   300 loss 0.4620
+step   600 loss 0.4393
+step   900 loss 0.2734
+step  1200 loss 0.2156
+step  1500 loss 0.3674
+step  1800 loss 0.2527
+step  2100 loss 0.1732
+step  2400 loss 0.2949
+step  2700 loss 0.2486
+step  3000 loss 0.3926
+step  3300 loss 0.2284
+step  3600 loss 0.2823
+step  3900 loss 0.2905
+step  4200 loss 0.2502
+step  4500 loss 0.4158
+step  4800 loss 0.4077
+step  5100 loss 0.3942
+step  5400 loss 0.4448
+step  5700 loss 0.4286
+step  6000 loss 0.4228
+{
+  "exp": "r2_halting_parity",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 1,
+  "seed": 2,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.4227997660636902,
+  "indist_acc": 0.703125,
+  "ood_acc": 0.572265625,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.9353448152542114
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5203251838684082
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.44117647409439087
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.9305555820465088
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.49425286054611206
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5263158082962036
+    }
+  },
+  "wall_s": 80.9,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=1 seed 3 ==
+step     1 loss 0.8307
+step   300 loss 0.4133
+step   600 loss 0.3653
+step   900 loss 0.4313
+step  1200 loss 0.3341
+step  1500 loss 0.3622
+step  1800 loss 0.3592
+step  2100 loss 0.4013
+step  2400 loss 0.3503
+step  2700 loss 0.3444
+step  3000 loss 0.3169
+step  3300 loss 0.2476
+step  3600 loss 0.3516
+step  3900 loss 0.2996
+step  4200 loss 0.2486
+step  4500 loss 0.4492
+step  4800 loss 0.5492
+step  5100 loss 0.5146
+step  5400 loss 0.4687
+step  5700 loss 0.3987
+step  6000 loss 0.5875
+{
+  "exp": "r2_halting_parity",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 1,
+  "seed": 3,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5875226855278015,
+  "indist_acc": 0.615234375,
+  "ood_acc": 0.513671875,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.767241358757019
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5040650367736816
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.38235294818878174
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.7222222089767456
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.5287356376647949
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.44736841320991516
+    }
+  },
+  "wall_s": 86.0,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=1 seed 4 ==
+step     1 loss 0.6904
+step   300 loss 0.5048
+step   600 loss 0.3317
+step   900 loss 0.3101
+step  1200 loss 0.2725
+step  1500 loss 0.3672
+step  1800 loss 0.3368
+step  2100 loss 0.3285
+step  2400 loss 0.2713
+step  2700 loss 0.2078
+step  3000 loss 0.3064
+step  3300 loss 0.2069
+step  3600 loss 0.2051
+step  3900 loss 0.3205
+step  4200 loss 0.3300
+step  4500 loss 0.5027
+step  4800 loss 0.4881
+step  5100 loss 0.4043
+step  5400 loss 0.4560
+step  5700 loss 0.4598
+step  6000 loss 0.5065
+{
+  "exp": "r2_halting_parity",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 1,
+  "seed": 4,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5065446496009827,
+  "indist_acc": 0.66015625,
+  "ood_acc": 0.56640625,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.8534482717514038
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.4796747863292694
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.6470588445663452
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.7916666865348816
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.477011501789093
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5639097690582275
+    }
+  },
+  "wall_s": 98.2,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=1 seed 5 ==
+step     1 loss 0.6764
+step   300 loss 0.4257
+step   600 loss 0.3788
+step   900 loss 0.3486
+step  1200 loss 0.3535
+step  1500 loss 0.2693
+step  1800 loss 0.2772
+step  2100 loss 0.2941
+step  2400 loss 0.2862
+step  2700 loss 0.2025
+step  3000 loss 0.2625
+step  3300 loss 0.3654
+step  3600 loss 0.3028
+step  3900 loss 0.3830
+step  4200 loss 0.3365
+step  4500 loss 0.4569
+step  4800 loss 0.4865
+step  5100 loss 0.4540
+step  5400 loss 0.3868
+step  5700 loss 0.4031
+step  6000 loss 0.4670
+{
+  "exp": "r2_halting_parity",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 1,
+  "seed": 5,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.46703973412513733,
+  "indist_acc": 0.630859375,
+  "ood_acc": 0.537109375,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.7715517282485962
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5203251838684082
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.47058823704719543
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.7777777910232544
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.49425286054611206
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5
+    }
+  },
+  "wall_s": 98.5,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=8 seed 1 ==
+step     1 loss 0.8775
+step   300 loss 0.3337
+step   600 loss 0.3095
+step   900 loss 0.2105
+step  1200 loss 0.2902
+step  1500 loss 0.1703
+step  1800 loss 0.1638
+step  2100 loss 0.6955
+step  2400 loss 0.4945
+step  2700 loss 0.4184
+step  3000 loss 0.2215
+step  3300 loss 0.3706
+step  3600 loss 0.4480
+step  3900 loss 0.2740
+step  4200 loss 0.4753
+step  4500 loss 0.4771
+step  4800 loss 0.5468
+step  5100 loss 0.4949
+step  5400 loss 0.5647
+step  5700 loss 0.5567
+step  6000 loss 0.5543
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 8,
+  "seed": 1,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5543169379234314,
+  "indist_acc": 0.640625,
+  "ood_acc": 0.5234375,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.7931034564971924
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5121951103210449
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.529411792755127
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.7222222089767456
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.4712643623352051
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5037593841552734
+    }
+  },
+  "wall_s": 350.8,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=8 seed 2 ==
+step     1 loss 0.7397
+step   300 loss 0.4690
+step   600 loss 0.2746
+step   900 loss 0.2308
+step  1200 loss 0.1191
+step  1500 loss 0.2477
+step  1800 loss 0.1131
+step  2100 loss 0.2087
+step  2400 loss 0.1816
+step  2700 loss 0.2504
+step  3000 loss 0.1057
+step  3300 loss 0.1062
+step  3600 loss 0.0865
+step  3900 loss 0.0036
+step  4200 loss 0.0001
+step  4500 loss 0.3994
+step  4800 loss 0.2928
+step  5100 loss 0.2262
+step  5400 loss 0.1711
+step  5700 loss 0.2630
+step  6000 loss 0.2267
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 8,
+  "seed": 2,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.22669152915477753,
+  "indist_acc": 0.859375,
+  "ood_acc": 0.55859375,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 1.0
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.7764227390289307
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.5
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.8611111044883728
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.568965494632721
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.46992480754852295
+    }
+  },
+  "wall_s": 346.7,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=8 seed 3 ==
+step     1 loss 0.7396
+step   300 loss 0.4265
+step   600 loss 0.3285
+step   900 loss 0.4169
+step  1200 loss 0.3199
+step  1500 loss 0.2928
+step  1800 loss 0.2413
+step  2100 loss 0.3563
+step  2400 loss 0.2622
+step  2700 loss 0.2558
+step  3000 loss 0.2697
+step  3300 loss 0.2205
+step  3600 loss 0.1773
+step  3900 loss 0.1911
+step  4200 loss 0.1237
+step  4500 loss 0.2924
+step  4800 loss 0.3842
+step  5100 loss 0.3745
+step  5400 loss 0.3428
+step  5700 loss 0.2994
+step  6000 loss 0.3023
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 8,
+  "seed": 3,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.30228155851364136,
+  "indist_acc": 0.755859375,
+  "ood_acc": 0.53515625,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.9913793206214905
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5853658318519592
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.38235294818878174
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.9166666865348816
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.522988498210907
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.4398496150970459
+    }
+  },
+  "wall_s": 289.9,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=8 seed 4 ==
+step     1 loss 0.6803
+step   300 loss 0.4227
+step   600 loss 0.2393
+step   900 loss 0.1901
+step  1200 loss 0.1570
+step  1500 loss 0.2415
+step  1800 loss 0.3219
+step  2100 loss 0.4598
+step  2400 loss 0.4241
+step  2700 loss 0.7515
+step  3000 loss 0.7096
+step  3300 loss 0.6915
+step  3600 loss 0.6274
+step  3900 loss 0.6096
+step  4200 loss 0.5973
+step  4500 loss 0.6496
+step  4800 loss 0.6486
+step  5100 loss 0.6410
+step  5400 loss 0.5875
+step  5700 loss 0.6539
+step  6000 loss 0.5990
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 8,
+  "seed": 4,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5990355014801025,
+  "indist_acc": 0.564453125,
+  "ood_acc": 0.541015625,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.6336206793785095
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.4918699264526367
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.6176470518112183
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.5972222089767456
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.5
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5526315569877625
+    }
+  },
+  "wall_s": 290.2,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=8 seed 5 ==
+step     1 loss 1.2753
+step   300 loss 0.4727
+step   600 loss 0.2754
+step   900 loss 0.2977
+step  1200 loss 0.3329
+step  1500 loss 0.2678
+step  1800 loss 0.3242
+step  2100 loss 0.2277
+step  2400 loss 0.2296
+step  2700 loss 0.6290
+step  3000 loss 0.4011
+step  3300 loss 0.3494
+step  3600 loss 0.6378
+step  3900 loss 0.6369
+step  4200 loss 0.5910
+step  4500 loss 0.6312
+step  4800 loss 0.6483
+step  5100 loss 0.6326
+step  5400 loss 0.5831
+step  5700 loss 0.5917
+step  6000 loss 0.5616
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 8,
+  "seed": 5,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5616465210914612,
+  "indist_acc": 0.55859375,
+  "ood_acc": 0.513671875,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.6594827771186829
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.4674796760082245
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.529411792755127
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.6527777910232544
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.4885057508945465
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.49248120188713074
+    }
+  },
+  "wall_s": 319.7,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=2 seed 1 ==
+step     1 loss 0.6754
+step   300 loss 0.3471
+step   600 loss 0.3073
+step   900 loss 0.1930
+step  1200 loss 0.1656
+step  1500 loss 0.3458
+step  1800 loss 0.1850
+step  2100 loss 0.1575
+step  2400 loss 0.7723
+step  2700 loss 0.1467
+step  3000 loss 0.1165
+step  3300 loss 0.1506
+step  3600 loss 0.1371
+step  3900 loss 0.1547
+step  4200 loss 0.2270
+step  4500 loss 0.4110
+step  4800 loss 0.3460
+step  5100 loss 0.2938
+step  5400 loss 0.3902
+step  5700 loss 0.4028
+step  6000 loss 0.4015
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 2,
+  "seed": 1,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.4014793634414673,
+  "indist_acc": 0.748046875,
+  "ood_acc": 0.560546875,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.9784482717514038
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5609756112098694
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.529411792755127
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.9583333134651184
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.4712643623352051
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5112782120704651
+    }
+  },
+  "wall_s": 135.7,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=2 seed 2 ==
+step     1 loss 0.7822
+step   300 loss 0.4750
+step   600 loss 0.3331
+step   900 loss 0.2913
+step  1200 loss 0.2318
+step  1500 loss 0.3422
+step  1800 loss 0.2306
+step  2100 loss 0.1810
+step  2400 loss 0.4087
+step  2700 loss 0.2972
+step  3000 loss 0.2599
+step  3300 loss 0.2714
+step  3600 loss 0.2806
+step  3900 loss 0.1771
+step  4200 loss 0.4316
+step  4500 loss 0.4626
+step  4800 loss 0.4474
+step  5100 loss 0.3810
+step  5400 loss 0.5147
+step  5700 loss 0.4472
+step  6000 loss 0.4263
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 2,
+  "seed": 2,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.42630642652511597,
+  "indist_acc": 0.677734375,
+  "ood_acc": 0.55078125,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.9224137663841248
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.47560974955558777
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.47058823704719543
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.8611111044883728
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.477011501789093
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5150375962257385
+    }
+  },
+  "wall_s": 135.4,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=2 seed 3 ==
+step     1 loss 0.8820
+step   300 loss 0.4457
+step   600 loss 0.4047
+step   900 loss 0.4464
+step  1200 loss 0.4269
+step  1500 loss 0.4721
+step  1800 loss 0.3415
+step  2100 loss 0.3465
+step  2400 loss 0.2994
+step  2700 loss 0.4170
+step  3000 loss 0.2718
+step  3300 loss 0.2295
+step  3600 loss 0.3065
+step  3900 loss 0.3966
+step  4200 loss 0.2395
+step  4500 loss 0.4283
+step  4800 loss 0.6019
+step  5100 loss 0.5271
+step  5400 loss 0.4806
+step  5700 loss 0.4413
+step  6000 loss 0.5250
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 2,
+  "seed": 3,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.5249777436256409,
+  "indist_acc": 0.658203125,
+  "ood_acc": 0.533203125,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.8491379022598267
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5121951103210449
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.4117647111415863
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.8194444179534912
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.5114942789077759
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.46992480754852295
+    }
+  },
+  "wall_s": 135.2,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=4 seed 1 ==
+step     1 loss 0.6970
+step   300 loss 0.3369
+step   600 loss 0.2755
+step   900 loss 0.2637
+step  1200 loss 0.2378
+step  1500 loss 0.2626
+step  1800 loss 0.1520
+step  2100 loss 0.1455
+step  2400 loss 0.1739
+step  2700 loss 0.1042
+step  3000 loss 0.0825
+step  3300 loss 0.1407
+step  3600 loss 0.1194
+step  3900 loss 0.0998
+step  4200 loss 0.1912
+step  4500 loss 0.3835
+step  4800 loss 0.3365
+step  5100 loss 0.2653
+step  5400 loss 0.3650
+step  5700 loss 0.3506
+step  6000 loss 0.3499
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 4,
+  "seed": 1,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.3499075472354889,
+  "indist_acc": 0.775390625,
+  "ood_acc": 0.560546875,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 1.0
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5853658318519592
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.6176470518112183
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.8611111044883728
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.522988498210907
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5037593841552734
+    }
+  },
+  "wall_s": 208.8,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=4 seed 2 ==
+step     1 loss 0.7391
+step   300 loss 0.4576
+step   600 loss 0.4116
+step   900 loss 0.2506
+step  1200 loss 0.2359
+step  1500 loss 0.3015
+step  1800 loss 0.1762
+step  2100 loss 0.1586
+step  2400 loss 0.3289
+step  2700 loss 0.2400
+step  3000 loss 0.2422
+step  3300 loss 0.2415
+step  3600 loss 0.1882
+step  3900 loss 0.1323
+step  4200 loss 0.1426
+step  4500 loss 0.3802
+step  4800 loss 0.3684
+step  5100 loss 0.4606
+step  5400 loss 0.3655
+step  5700 loss 0.3753
+step  6000 loss 0.6450
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 4,
+  "seed": 2,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.6450145840644836,
+  "indist_acc": 0.55859375,
+  "ood_acc": 0.517578125,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 0.5905172228813171
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5284552574157715
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.5588235259056091
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.5416666865348816
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.477011501789093
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.5375939607620239
+    }
+  },
+  "wall_s": 209.3,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== k=4 seed 3 ==
+step     1 loss 0.9073
+step   300 loss 0.3432
+step   600 loss 0.2461
+step   900 loss 0.2396
+step  1200 loss 0.1955
+step  1500 loss 0.1798
+step  1800 loss 0.1540
+step  2100 loss 0.1419
+step  2400 loss 0.1450
+step  2700 loss 0.1604
+step  3000 loss 0.1339
+step  3300 loss 0.1530
+step  3600 loss 0.0996
+step  3900 loss 0.0877
+step  4200 loss 0.0903
+step  4500 loss 0.2705
+step  4800 loss 0.3206
+step  5100 loss 0.4931
+step  5400 loss 0.3689
+step  5700 loss 0.3137
+step  6000 loss 0.3362
+{
+  "exp": "r3_latent_depth",
+  "task": "prefix_parity",
+  "arm": "fixed",
+  "depth": 4,
+  "seed": 3,
+  "steps": 6000,
+  "d_model": 96,
+  "K": 8,
+  "beta": 0.05,
+  "prior_p": 0.25,
+  "curriculum": true,
+  "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+  "halt_bias_init": null,
+  "train_loss_last": 0.33621275424957275,
+  "indist_acc": 0.7578125,
+  "ood_acc": 0.576171875,
+  "mean_steps": null,
+  "buckets_indist": {
+    "q_bucket_0": {
+      "n": 232,
+      "acc": 1.0
+    },
+    "q_bucket_1": {
+      "n": 246,
+      "acc": 0.5731707215309143
+    },
+    "q_bucket_2": {
+      "n": 34,
+      "acc": 0.44117647409439087
+    }
+  },
+  "buckets_ood": {
+    "q_bucket_0": {
+      "n": 72,
+      "acc": 0.9583333134651184
+    },
+    "q_bucket_1": {
+      "n": 174,
+      "acc": 0.545976996421814
+    },
+    "q_bucket_2": {
+      "n": 266,
+      "acc": 0.49248120188713074
+    }
+  },
+  "wall_s": 209.3,
+  "python_hash_seed": "0",
+  "torch_version": "2.13.0"
+}
+== R3 verdict ==
+GATE ood_acc k8 vs k1: [0.5234375, 0.55859375, 0.53515625, 0.541015625, 0.513671875] [0.552734375, 0.572265625, 0.513671875, 0.56640625, 0.537109375]
+publishable ok= False report= {"tag": "r3_depth8_vs_depth1_ood", "bimodality_arm-a": {"bimodal": false, "split_at": 0.5498046875, "gap_ratio": 2.25, "groups": [[0.513671875, 0.5234375, 0.53515625, 0.541015625], [0.55859375]]}, "bimodality_arm-b": {"bimodal": false, "split_at": 0.525390625, "gap_ratio": 2.4, "groups": [[0.513671875], [0.537109375, 0.552734375, 0.56640625, 0.572265625]]}, "sign_test": {"p": 0.375, "wins": 1, "losses": 4, "n_effective": 5}, "ok": false, "reasons": ["配对符号检验 p=0.375 ≥ 0.05"]}
+curve (mean of seeds):
+  k=1: indist=0.6551 ood=0.5484 wall=[81.4, 80.9, 86.0, 98.2, 98.5]
+  k=2: indist=0.6947 ood=0.5482 wall=[135.7, 135.4, 135.2]
+  k=4: indist=0.6973 ood=0.5514 wall=[208.8, 209.3, 209.3]
+  k=8: indist=0.6758 ood=0.5344 wall=[350.8, 346.7, 289.9, 290.2, 319.7]
+summary written
