@@ -63,8 +63,7 @@ LR = 1e-3
 BATCH = 64
 
 
-def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):
-    lens = torch.randint(lo, hi + 1, (n,), generator=gen)
+def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):    lens = torch.randint(lo, hi + 1, (n,), generator=gen)
     maxlen = int(lens.max())
     x = torch.zeros(n, maxlen, dtype=torch.long)
     mask = torch.zeros(n, maxlen, dtype=torch.bool)
@@ -108,6 +107,9 @@ class HaltingNet(nn.Module):
         self.adaptive = adaptive
         if adaptive:
             self.halt = nn.Linear(D_MODEL, 1)
+            # 初始停步质量按 Geometric(0.12) 铺开：若 λ 初始接近 1，第 1 步独吞全部
+            # 预测质量，后续迭代收不到梯度、永远死掉（screening #1 坍缩到 1.01 步）。
+            nn.init.constant_(self.halt.bias, -2.0)
 
     @staticmethod
     def _pool(h, mask):
@@ -189,8 +191,10 @@ def main() -> int:
     model = HaltingNet(adaptive=(args.arm == "adaptive"))
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01)
     t0 = time.time()
+    curriculum_until = int(0.7 * args.steps)  # 长度课程：前期短串（易），后期全量 [8,32]
     for step in range(1, args.steps + 1):
-        x, mask, y = make_batch(gen_data, 8, 32, BATCH)
+        lo, hi = (4, 16) if step <= curriculum_until else (8, 32)
+        x, mask, y = make_batch(gen_data, lo, hi, BATCH)
         logits, halt = model(x, mask)
         loss = nn.functional.cross_entropy(logits, y)
         if halt is not None:
@@ -214,6 +218,9 @@ def main() -> int:
         "K": K_STEPS,
         "beta": BETA,
         "prior_p": PRIOR_P,
+        "curriculum": True,
+        "curriculum_split": "first 70% steps L in [4,16], then [8,32]",
+        "halt_bias_init": -2.0 if args.arm == "adaptive" else None,
         "train_loss_last": float(loss.item()),
         "indist_acc": indist,
         "ood_acc": ood,
