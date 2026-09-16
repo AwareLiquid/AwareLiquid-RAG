@@ -45,13 +45,19 @@
 - 运行计划：本机 `PYTHONHASHSEED=1 .venv/bin/python benchmarks/bench_adapter.py --fake`（分钟级）。
 - 状态：**已闭环（2026-09-11 R0）**：输出与旧日志逐字节一致（`benchmarks/results/r0_bench_fake_20260911_r1.log`）。
 
-## P0' — 下一轮默认方向：自适应停止（ACT/PonderNet 式 halt）合成任务冒烟 [IDEA→下轮 prereg]
+## P0' — 自适应停止（PonderNet 式 halt）合成 parity 消融 [SCREENING NO-GO ×1（2026-09-16）]
 
-- 浮现理由（2026-09-16）：R1 因题集无标注 + mock 退化 + 计费未授权三重阻塞，按协议停止等人工；
-  类脑轴里唯一**自带金标、全离线、零 API 成本**的方向是合成任务上的自适应停止消融
-  （变量长度 parity/多步求和：模型必须学会"多想几步"，halt 头输出停步分布）。
-- 下一轮动作：写新预注册（`prereg:` 落盘判负标准）→ 单 seed 冒烟（≤1h 本机）→ 过了 screening 再谈多种子。
-- 依赖：无（纯 torch 合成数据）；与 R1 的人工资裁定全解耦。
+- 预注册：`docs/PREREGISTRATION.md` 附录 R2（2026-09-16 落盘后运行）；脚本 `research/exp_halting_parity.py`。
+- **R2 screening #1 判定：NO-GO**（证据 `benchmarks/results/r2_halting_smoke_20260916_r1.log`）：
+  G1 确定性 PASS（科学指标逐比特一致，仅 wall_s 仪表字段差 0.1s）；G2 FAIL（两臂 in-dist
+  ≈0.49/0.51 < 0.55，chance 水平）；G3 FAIL（mean_steps 1.01，halt 坍缩）；G4 PASS
+  （fixed 22.6s / adaptive 90.9s，2臂×5seeds ≈ 9.5 min，多种子可留本机）。
+- 根因假设（下轮验证，非结论）：①1200 步对 pooled-readout parity 完全不够（loss 卡 ln2）；
+  ②任务本身没学到 → halt 头无信号可学，坍缩是果不是因（"先有任务收益，才有停步学习"）。
+- **下轮（已在预注册 G2 处置条款授权内，无需人工）：**调容量/任务形式重筛——steps 6k–10k +
+  2 层 trunk + 长度课程；或改任务为"累积取模和"类迭代友好任务；halt 头前 N 步冻结 warm-up。
+  重筛全过 G1–G4 才放行多种子（seeds≥3，publishable 门）。
+- 依赖：无（纯 torch 合成数据，全离线）；与 R1 人工裁定全解耦。
 
 ## P2 — 工程：Kaggle 通道验证（CLI 安装 + 凭证 + CPU notebook hello-world）[IDEA]
 
