@@ -62,3 +62,23 @@
   环境 = 本机冒烟（单 seed 超小子集，≤1h）→ 全量若 >1h 则走 Kaggle CPU notebook（通道待验证）；
   结果归档 `benchmarks/results/r1_lexical_vs_hybrid_<日期>_r<轮>.{json,log}`。
 - 结果（跑完填）：（待填）数字 + publishable() 输出 + verdict。
+
+## R2：自适应停止（PonderNet 式 halt）合成 parity 消融 — 2026-09-16
+
+- 动机：类脑轴（自适应停止与测试时计算）首个自带金标的对照实验：迭代 + 学到的停步
+  相对固定深度是否提升长度外推能力（OOD parity）。
+- 两臂：arm-fixed = trunk 后 workspace block 恰 1 次、无 halt 头；
+  arm-adaptive = 同一 block 最多迭代 K=8 + PonderNet 停步（Geometric(0.25) 先验、β=0.05）。
+  其余（d=96、batch 64、AdamW lr 1e-3、1200 步、CPU 确定性）全同；脚本
+  `research/exp_halting_parity.py`（预注册同步写死于其 docstring）。
+- 预注册判据（跑之前写死）：
+  - 最终指标：OOD accuracy（per-seed 配对）；判优 =
+    `publishable(per_seed_adaptive, per_seed_fixed)` 为 True；判负入 `docs/RESULTS.md`
+    筛查区，方向 REJECTED（留痕），不进毕业流程。
+  - 本轮 screening（seed=1）go/no-go：G1 确定性（arm-fixed 同 seed 两跑逐字段一致）；
+    G2 两臂 in-dist acc ≥ 0.55；G3 adaptive 平均停步 E[k] ∈ [1.3, 7.7] 且无 NaN；
+    G4 单臂 wall ≤ 10 min。全过 → 多种子放行（seeds=3 起，5 更佳；若 2臂×5seeds
+    预计 >60 min 则多种子按算力政策转 Kaggle）；任一不过 → 如实归档原因，
+    下一轮修后再筛；修改判据本身须预注册修订 + 人工确认。
+- 运行计划：本机冒烟（≤1h 内）；结果归档 `benchmarks/results/r2_halting_smoke_<日期>_r<轮>.{json,log}`。
+- 结果（跑完填）：（待填）数字 + screening go/no-go 逐条判定。
