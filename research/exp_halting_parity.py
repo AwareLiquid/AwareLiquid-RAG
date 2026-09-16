@@ -1,39 +1,35 @@
 """exp_halting_parity.py — R2 自适应停止（PonderNet 式 halt）合成任务实验.
 
 方向：自适应停止与测试时计算（backlog P0'）。合成任务自带金标，全离线，
-零 API 成本；这是类脑轴里唯一不依赖人工裁定的可跑方向。
+零 API 成本。
 
-任务：二进制串 parity（全串异或）。训练长度 U[8,32]；测试 in-dist U[8,32]、
-OOD U[40,64]。两臂除"workspace block 迭代方式"外全同：
+任务（--task）：
+  parity         全串异或（screening #1/#2 的任务，原样保留以复现旧档）。
+  prefix_parity  查询位置前缀异或（screening #3，2026-09-17 起）：输入 bits +
+                 查询位标记（id=2 叠加在 qpos 位置），目标 = bits[0:qpos+1] 的
+                 异或。每个迭代步对应明确的前缀扩展增益，难度随 q 连续变化，
+                 halt 头第一次有真实的"多想一步"收益结构；短前缀样本（q 小）
+                 天然构成课程。
+
+两臂（除 workspace 迭代方式外全同）：
   arm-fixed    trunk 后 workspace block 恰好跑 1 次，直接读出（无 halt 头）。
   arm-adaptive workspace block 最多迭代 K=8，PonderNet 式 halt 头逐步累积
-               预测（p_k = λ_k Π_{j<k}(1-λ_j)），halting 损失 = 与
-               Geometric(p_g=0.25) 先验的交叉熵，β=0.05；总损失 = CE + β·L_halting。
+               预测，halting 损失 = 与 Geometric(p_g=0.25) 先验的交叉熵，
+               β=0.05；总损失 = CE + β·L_halting。
 
-预注册（先于任何运行落盘；同步见 docs/PREREGISTRATION.md 附录 R2）：
+预注册：docs/PREREGISTRATION.md 附录 R2 及其 screening 序节。当前生效：
+screening #3 配置（2026-09-17 落盘）——task=prefix_parity，6000 步，长度课程
+（前 70% 步 L∈[4,16]，后 30% 步 L∈[8,32]），halt bias -2；判据 G1–G4 不变：
+  G1 确定性（arm-fixed 同 seed 两跑，除 wall_s 外逐字段一致；文件缺失不得判 PASS）；
+  G2 两臂 in-dist acc ≥ 0.55；G3 adaptive 平均停步 E[k] ∈ [1.3, 7.7] 且无 NaN；
+  G4 单臂 wall ≤ 10 min。全过 → 多种子放行（seeds≥3，publishable 门）。
 
-  最终对比（多种子阶段，非本轮）：指标 = OOD accuracy（per-seed 配对），
-  判优 = publishable(per_seed_adaptive, per_seed_fixed) 为 True
-  （≥3 seeds、双臂非双峰、配对符号检验 p<0.05）；判负则 adaptive 入
-  docs/RESULTS.md 筛查区，方向 REJECTED（留痕），不进毕业流程。
-
-  本轮 screening（seed=1 单种子）go/no-go（跑之前写死）：
-  G1 确定性：arm-fixed 同 seed 连跑两次，JSON 指标逐字段一致。
-  G2 学习信号：两臂 in-dist test accuracy ≥ 0.55（二分类 chance=0.5）。
-     低于 → 判"任务/容量欠配"，下一轮调容量重筛，不进入多种子。
-  G3 halt 不坍缩：arm-adaptive 平均停步数 E[k] ∈ [1.3, 7.7]，无 NaN。
-  G4 算力预算：单臂 wall time ≤ 10 min（2 臂 × 5 seeds ≈ ≤100 min；
-     >60 min 则多种子阶段按算力政策转 Kaggle，本机不硬跑）。
-
-  G1–G4 全过 → 多种子阶段放行；任一不过 → 如实记录原因，下一轮修
-  （改判负标准本身须走预注册修订 + 人工确认）。
-
-确定性纪律：CPU-only、torch.use_deterministic_algorithms(True)、全部随机
-源走显式 torch.Generator(seed)、PYTHONHASHSEED 钉 0（子进程同理）。
+确定性纪律：CPU-only、torch.use_deterministic_algorithms(True)、全部随机源走
+显式 torch.Generator(seed)、PYTHONHASHSEED 钉 0。运行前必须过 py_compile。
 
 用法：
-    .venv/bin/python research/exp_halting_parity.py --arm fixed --seed 1 \
-        --steps 1200 --out benchmarks/results/r2_halting_smoke_<date>_r1.json
+    .venv/bin/python research/exp_halting_parity.py --task prefix_parity \
+        --arm adaptive --seed 1 --steps 6000 --out <path>.json
 """
 
 from __future__ import annotations
@@ -61,6 +57,7 @@ BETA = 0.05
 PRIOR_P = 0.25
 LR = 1e-3
 BATCH = 64
+QUERY_ID = 2
 
 
 def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):
@@ -76,6 +73,24 @@ def make_batch(gen: torch.Generator, lo: int, hi: int, n: int):
     for i, L in enumerate(lens.tolist()):
         parity[i] = int(x[i, :L].sum().item()) % 2
     return x, mask, parity
+
+
+def make_prefix_batch(gen: torch.Generator, lo: int, hi: int, n: int):
+    """prefix parity：目标 = bits[0:qpos+1] 的异或（标记位含入前缀）。"""
+    lens = torch.randint(lo, hi + 1, (n,), generator=gen)
+    maxlen = int(lens.max())
+    x = torch.zeros(n, maxlen, dtype=torch.long)
+    mask = torch.zeros(n, maxlen, dtype=torch.bool)
+    qpos = torch.zeros(n, dtype=torch.long)
+    target = torch.zeros(n, dtype=torch.long)
+    for i, L in enumerate(lens.tolist()):
+        bits = torch.randint(0, 2, (L,), generator=gen)
+        q = int(torch.randint(1, L + 1, (1,), generator=gen))
+        x[i, :L] = bits
+        mask[i, :L] = True
+        qpos[i] = q - 1
+        target[i] = int(bits[:q].sum().item()) % 2
+    return x, mask, qpos, target
 
 
 class Block(nn.Module):
@@ -100,7 +115,7 @@ class Block(nn.Module):
 class HaltingNet(nn.Module):
     def __init__(self, adaptive: bool):
         super().__init__()
-        self.tok = nn.Embedding(2, D_MODEL)
+        self.tok = nn.Embedding(3, D_MODEL)  # 0/1 bit；id2 仅作查询标记向量
         self.pos = nn.Embedding(MAX_LEN, D_MODEL)
         self.trunk = Block()
         self.workspace = Block()
@@ -119,13 +134,17 @@ class HaltingNet(nn.Module):
         summed = (h * mask.unsqueeze(-1)).sum(1)
         return summed / mask.sum(1, keepdim=True).clamp(min=1)
 
-    def forward(self, x, mask):
+    def forward(self, x, mask, qpos=None):
         n, L = x.shape
         pos = torch.arange(L, device=x.device).unsqueeze(0).expand(n, -1)
-        h = self.trunk(self.tok(x) + self.pos(pos), mask)
+        emb = self.tok(x)
+        if qpos is not None:
+            marker = torch.zeros_like(emb)
+            marker[torch.arange(n), qpos] = 1.0
+            emb = emb + marker * self.tok.weight[QUERY_ID]
+        h = self.trunk(emb + self.pos(pos), mask)
         if not self.adaptive:
             return self.head(self._pool(self.workspace(h, mask), mask)), None
-        halted = torch.zeros(n, dtype=torch.bool)
         acc = torch.zeros(n, 2)
         lam_list, p_list = [], []
         prev = torch.ones(n)
@@ -158,23 +177,52 @@ def halting_loss(p_list, p_remain):
     return torch.stack(losses).sum()
 
 
-def evaluate(model, gen, lo, hi, n=512):
+def _bucket_of(q: torch.Tensor):
+    """q≤8 / 9-24 / ≥25 → 0/1/2（难度分档诊断）。"""
+    return torch.where(q <= 8, torch.zeros_like(q),
+                       torch.where(q <= 24, torch.ones_like(q), torch.full_like(q, 2)))
+
+
+def evaluate(model, gen, lo, hi, n, task):
     model.eval()
-    x, mask, y = make_batch(gen, lo, hi, n)
+    qpos = None
+    if task == "parity":
+        x, mask, y = make_batch(gen, lo, hi, n)
+    else:
+        x, mask, qpos, y = make_prefix_batch(gen, lo, hi, n)
     with torch.no_grad():
-        logits, halt = model(x, mask)
-        acc = (logits.argmax(1) == y).float().mean().item()
+        logits, halt = model(x, mask, qpos)
+        hit = (logits.argmax(1) == y)
+        acc = hit.float().mean().item()
+        buckets = None
+        if task != "parity":
+            b = _bucket_of(qpos + 1)
+            buckets = {}
+            for bi in range(3):
+                sel = b == bi
+                buckets[f"q_bucket_{bi}"] = {
+                    "n": int(sel.sum()),
+                    "acc": hit[sel].float().mean().item() if int(sel.sum()) else None,
+                }
         mean_steps = None
         if halt is not None:
             lam_list, p_list, p_remain = halt
             ks = torch.arange(1, K_STEPS + 1, dtype=torch.float32).unsqueeze(1)
-            mean_steps = float((p_list * ks).sum(0).add(p_remain * K_STEPS).mean().item())
+            steps = (p_list * ks).sum(0).add(p_remain * K_STEPS)
+            mean_steps = float(steps.mean().item())
+            if buckets is not None:
+                for bi in range(3):
+                    sel = _bucket_of(qpos + 1) == bi
+                    buckets[f"q_bucket_{bi}"]["mean_steps"] = (
+                        float(steps[sel].mean().item()) if int(sel.sum()) else None
+                    )
     model.train()
-    return acc, mean_steps
+    return acc, mean_steps, buckets
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--task", choices=("parity", "prefix_parity"), default="parity")
     ap.add_argument("--arm", choices=("fixed", "adaptive"), required=True)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--steps", type=int, default=1200)
@@ -195,8 +243,12 @@ def main() -> int:
     curriculum_until = int(0.7 * args.steps)  # 长度课程：前期短串（易），后期全量 [8,32]
     for step in range(1, args.steps + 1):
         lo, hi = (4, 16) if step <= curriculum_until else (8, 32)
-        x, mask, y = make_batch(gen_data, lo, hi, BATCH)
-        logits, halt = model(x, mask)
+        qpos = None
+        if args.task == "parity":
+            x, mask, y = make_batch(gen_data, lo, hi, BATCH)
+        else:
+            x, mask, qpos, y = make_prefix_batch(gen_data, lo, hi, BATCH)
+        logits, halt = model(x, mask, qpos)
         loss = nn.functional.cross_entropy(logits, y)
         if halt is not None:
             lam_list, p_list, p_remain = halt
@@ -208,10 +260,11 @@ def main() -> int:
             print(f"step {step:5d} loss {loss.item():.4f}", flush=True)
     wall = time.time() - t0
 
-    indist, mean_steps = evaluate(model, gen_eval_in, 8, 32)
-    ood, _ = evaluate(model, gen_eval_ood, 40, 64)
+    indist, mean_steps, buckets_in = evaluate(model, gen_eval_in, 8, 32, 512, args.task)
+    ood, _, buckets_ood = evaluate(model, gen_eval_ood, 40, 64, 512, args.task)
     result = {
         "exp": "r2_halting_parity",
+        "task": args.task,
         "arm": args.arm,
         "seed": args.seed,
         "steps": args.steps,
@@ -226,6 +279,8 @@ def main() -> int:
         "indist_acc": indist,
         "ood_acc": ood,
         "mean_steps": mean_steps,
+        "buckets_indist": buckets_in,
+        "buckets_ood": buckets_ood,
         "wall_s": round(wall, 1),
         "python_hash_seed": os.environ.get("PYTHONHASHSEED"),
         "torch_version": torch.__version__,

@@ -114,3 +114,17 @@
 - 过程事故留痕：00:03 预注册 commit 中的脚本 def 行损坏（我的编辑事故，运行全部
   IndentationError，未产出指标，traceback 日志因轮内日志改名操作未保留，git 历史
   中损坏版本可考）；修复后 attempt B 正常运行。
+
+### R2 screening #3 配置（2026-09-17 00:35 落盘，先于运行；升级条款授权的任务形式更换）
+
+- 任务：`prefix_parity`（查询位置前缀异或）——输入 bits + 查询位标记（embedding id2
+  叠加于 qpos），目标 = bits[0:qpos+1] 的异或。相对 parity 的结构性差异：难度随 q
+  连续变化（短前缀天然是课程），迭代步对应明确的前缀扩展增益。
+- 其余继承 screening #2 配置：6000 步、长度课程（前 70% 步 L∈[4,16] 后 [8,32]）、
+  halt bias -2、d=96/K=8/β=0.05/Geometric(0.25)、AdamW 1e-3、batch 64、CPU 确定性。
+- 判据 G1–G4 不变（同 R2 原文；G1 判定对象=除 wall_s 外全部字段，且文件缺失不得判
+  PASS）。新增诊断字段（不作判据）：in-dist/OOD 的 q 分桶（≤8 / 9–24 / ≥25）acc 与
+  adaptive 分桶平均停步——用于检验"长前缀用更多步"的方向性。
+- 运行前防线（screening #2 事故后固化）：`py_compile` 强制 + 双臂 150 步 infra
+  selfcheck（本轮已过，无 NaN、JSON 字段齐全）→ 再进正式三连。
+- 结果（跑完填）：（待填）
