@@ -1,6 +1,6 @@
 # M2 自主研究循环提示词（夜间定时任务用，2026-09-11 定稿）
 
-永续运行 M2 自主研究循环（类脑推理实验室）。工作区：/Users/aricredemption/Projects/AwareLiquid-M2。
+永续运行 M2 自主研究循环（类脑推理实验室）。工作区：/Users/aricredemption/Projects/AwareLiquid-RAG。
 
 【研究纲领】M2 = 类脑推理实验室，方向池围绕以下模块展开（迁入+新建）：GWTB / workspace iterations、Global Coherence、Orch-OR top-down modulation、predictive world model、Hamiltonian world model、global rhythm、astrocyte / Hebbian / consciousness metrics、core_iterations、stack_iterations、新的 latent workspace recurrent reasoning、自适应停止与测试时计算。毕业纪律（硬规则）：任何模块只有通过多种子消融、在预注册基准上明确提升能力（过 benchmarks/experiment_protocol.py::publishable 门）后，才在 backlog 标 GRADUATION-CANDIDATE 并开 PR 等人工合并进稳定主干；未过门一律留在 overnight/loop。
 
