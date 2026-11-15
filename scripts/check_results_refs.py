@@ -42,6 +42,10 @@ from typing import Dict, Iterable, List, Optional, Tuple
 DEFAULT_RESULTS_RELATIVE = "docs/RESULTS.md"
 DEFAULT_REPO_ROOT = Path(__file__).resolve().parents[1]
 
+# Paths that RESULTS.md names as things that are deliberately NOT in the repo
+# (negative evidence). They are skipped, not failed.
+_NON_COMMITTED_REFERENCES = {"answer.csv"}
+
 KNOWN_EXTENSIONS = (
     ".md",
     ".py",
@@ -136,14 +140,25 @@ def resolve_manifest_entry(raw: str, repo_root: Path) -> Tuple[Optional[Path], s
     if not p:
         return None, "empty path"
     candidate = Path(p)
-    if not candidate.is_absolute():
+    # POSIX-absolute paths written on another machine ("/Users/...", "/tmp/...")
+    # are reported as *not* absolute by pathlib on Windows, so test the raw
+    # string too; otherwise they get joined onto the checkout and reported as a
+    # bogus missing file.
+    if not candidate.is_absolute() and not p.startswith("/"):
         return repo_root / candidate, ""
     try:
         candidate.resolve().relative_to(repo_root)
         return candidate, ""
     except ValueError:
         pass
-    parts = candidate.parts
+    parts = list(candidate.parts)
+    # Remap any ".../docs/runs/<run>/..." prefix onto the local checkout. The
+    # manifests were written before the repository was renamed
+    # (AwareLiquid-M2 -> AwareLiquid-RAG), so matching on the checkout directory
+    # name alone would miss them.
+    for index in range(len(parts) - 1):
+        if tuple(parts[index:index + 2]) == ("docs", "runs"):
+            return repo_root.joinpath(*parts[index:]), "remapped"
     if repo_root.name in parts:
         i = len(parts) - 1 - parts[::-1].index(repo_root.name)
         tail = parts[i + 1 :]
@@ -207,6 +222,16 @@ class Checker:
 
     def check_reference(self, token: str, path: str) -> None:
         self.n_refs += 1
+        # RESULTS.md deliberately cites local artifacts as *negative* evidence
+        # ("answer.csv is not in a submittable state / not committed"). Those
+        # paths are named so the claim is checkable by a human, not so the gate
+        # can open them -- skip instead of failing.
+        if path in _NON_COMMITTED_REFERENCES:
+            self.skip(
+                "`{}`".format(token),
+                "explicitly not committed (negative-evidence reference)",
+            )
+            return
         resolved, detail = self._locate(path)
         if resolved is None:
             self.fail("`{}`".format(token), detail or "referenced path not found in repository")
