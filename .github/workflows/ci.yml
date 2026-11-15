@@ -1,0 +1,49 @@
+# 证据门禁（evidence gate）：单 job CI。
+#
+# M1 仓库的治理缺口是"靠自觉、没有机器强制"——文档里声称的证据没人校验。
+# 本 job 把两件事变成合并/推送的硬性门槛：
+#   1) python -m pytest -q                       全量单元测试（离线、CPU-only）；
+#   2) python scripts/check_results_refs.py      校验 RESULTS.md（单一事实源）里
+#      引用的每个路径真实存在、docs/runs/*/manifest.json 指向的仓库内产物存在、
+#      每个 *.sha256 sidecar 与实际文件哈希一致。
+# 任何一条失败，CI 红灯：杜绝"文档说了但仓库里没有"的断言进入 main。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: test (evidence gate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      # 双保险：conftest.py 已在进程内固定 RNG/哈希行为，这里在 CI 环境层面
+      # 再钉一次 PYTHONHASHSEED，保证任何子进程/工具脚本继承同样的种子。
+      PYTHONHASHSEED: "0"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 先装 CPU 版 torch，避免 PyPI 默认 wheel 拖进 CUDA 运行时大包；
+      # 之后的 `pip install -e '.[dev]'` 检测到 torch 已满足 torch>=2.0.0，不会重装。
+      - name: Install CPU-only PyTorch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install package with dev dependencies
+        run: pip install -e '.[dev]'
+
+      - name: Run unit tests
+        run: python -m pytest -q
+
+      - name: Check RESULTS.md evidence references
+        run: python scripts/check_results_refs.py

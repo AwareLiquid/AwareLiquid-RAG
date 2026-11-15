@@ -45,3 +45,6 @@ reference/
 output/
 data/
 docs/runs/
+
+# Run artifacts should not be committed (evidence is the sha256 sidecar, not the full contract dump)
+docs/runs/*/stage-contract.json
