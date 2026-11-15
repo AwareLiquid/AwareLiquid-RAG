@@ -264,7 +264,13 @@ def build_agent(use_fake: bool) -> MemoryQAAgent:
         torch.set_num_threads(1)
         enc = SentenceEncoder()
     store = PersistentKnowledgeMemory(key_dim=enc.dim, db_path=":memory:")
-    cfg = RetrievalConfig(max_chars=140, overlap_chars=30, top_k=4, compression_budget=400)
+    cfg = RetrievalConfig(
+        max_chars=140, overlap_chars=30, top_k=4, compression_budget=400,
+        # This harness always supplies an encoder (real e5, or the lexical
+        # stand-in), so it must run the hybrid path: the lexical backend
+        # rejects an encoder outright (MemoryQAAgent.__init__).
+        retrieval_backend="hybrid",
+    )
     return MemoryQAAgent(encoder=enc, store=store, chat_client=MockChatClient(), config=cfg)
 
 
