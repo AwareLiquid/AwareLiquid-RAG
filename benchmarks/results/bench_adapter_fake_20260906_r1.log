@@ -1,0 +1,25 @@
+=== AwareLiquid adapter benchmark (lexical stand-in) ===
+
+  ingested annual-2023      -> 33 chunks
+  ingested bond-prospectus  -> 32 chunks
+  ingested reg-filing       -> 32 chunks
+  FTS5 lexical channel: available
+
+  per-question recall@1 (dense -> hybrid):
+    q1: 1 -> 1
+    q2: 1 -> 1
+    q3: 0 -> 0
+    q4: 0 -> 0
+    q5: 1 -> 1
+    q6: 1 -> 1
+    q7: 1 -> 1
+    q8: 1 -> 1
+
+--- ablation: dense-only vs hybrid RRF ---
+  recall@1 (answer in TOP chunk): dense 6/8 (75%)   ->   hybrid 6/8 (75%)
+  recall@4                     : dense 7/8 (88%)   ->   hybrid 8/8 (100%)
+  answer retention              : dense 7/8   hybrid 8/8
+  end-to-end valid rows         : 8/8
+  prompt context tokens         : 1254 vs full-doc 22668 -> 94% fewer
+
+RESULT: PASS (hybrid recall@1 6/8 >= dense 6/8, recall@4 8/8 >= dense 7/8)
